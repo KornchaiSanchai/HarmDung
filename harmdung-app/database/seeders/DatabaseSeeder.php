@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
 
         User::firstOrCreate(
             ['email' => 'member@example.com'],
-            ['name' => 'Test Member', 'password' => 'password', 'phone' => '0812345678'],
+            ['name' => 'Test Member', 'password' => 'password'],
         );
 
         $order = [
