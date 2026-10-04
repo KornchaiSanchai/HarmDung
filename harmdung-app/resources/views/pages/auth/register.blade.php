@@ -7,18 +7,6 @@
 
         <form method="POST" action="{{ route('register.store') }}" class="flex flex-col gap-6">
             @csrf
-            <!-- Name -->
-            <flux:input
-                name="name"
-                :label="__('Name')"
-                :value="old('name')"
-                type="text"
-                required
-                autofocus
-                autocomplete="name"
-                :placeholder="__('Full name')"
-            />
-
             <!-- Email Address -->
             <flux:input
                 name="email"
@@ -29,7 +17,16 @@
                 autocomplete="email"
                 placeholder="email@example.com"
             />
-
+            <!-- Username (เก็บในคอลัมน์ users.name) -->
+            <flux:input
+               name="name"
+                :label="__('Username')"
+                :value="old('name')"
+                type="text"
+                required
+                autocomplete="username"
+                :placeholder="__('Username')"
+            />
             <!-- Password -->
             <flux:input
                 name="password"
