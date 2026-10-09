@@ -11,19 +11,21 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-[#111111] text-white font-sans antialiased min-h-screen pb-20">
+<body class="bg-brand-dark text-white font-sans antialiased min-h-screen pb-10">
 
     <!-- แถบนำทาง (Navbar) -->
     <nav class="flex items-center justify-between px-8 py-4 border-b border-gray-800">
         <div class="flex items-center gap-8">
-            <!-- โลโก้ -->
+            
+            <!-- เปลี่ยนโลโก้เป็นรูปภาพ -->
             <a href="/" class="flex items-center shrink-0">
-                <img src="/images/logo.png" alt="HD Harmdung" class="h-10 w-auto object-contain scale-125 origin-left">
+                <!-- เปลี่ยนชื่อไฟล์ logo.png เป็นชื่อไฟล์จริงของคุณได้เลย -->
+                <img src="/images/logo.png" alt="HD Harmdung" class="h-10 w-auto object-contain scale-150 origin-left">
             </a>
             
-            <!-- เมนู (สลับสถานะปุ่ม Active มาที่ สินค้าทั้งหมด) -->
+            <!-- เมนู -->
             <div class="flex items-center gap-2">
-                <a href="/" class="flex items-center gap-2 px-5 py-2 text-sm text-gray-300 hover:text-white transition">
+                <a href="/home" class="flex items-center gap-2 px-5 py-2 text-sm text-gray-300 hover:text-white transition">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                     หน้าแรก
                 </a>
@@ -37,7 +39,7 @@
         <!-- ปุ่มเข้าสู่ระบบ / สมัครสมาชิก -->
         <div class="flex items-center gap-4 text-sm font-semibold">
             <a href="/login" class="bg-white text-black px-6 py-2 rounded-lg hover:bg-gray-200 transition">เข้าสู่ระบบ</a>
-            <a href="/register" class="bg-[#00E5FF] text-black px-6 py-2 rounded-lg hover:bg-cyan-300 transition">สมัครสมาชิก</a>
+            <a href="/register" class="bg-brand-cyan text-black px-6 py-2 rounded-lg hover:bg-cyan-300 transition">สมัครสมาชิก</a>
         </div>
     </nav>
 

@@ -2,7 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'welcome')->name('home');
+Route::view('/home', 'welcome')->name('home');
+
 
 Route::get('/products', function () {
     return view('products');
