@@ -23,9 +23,20 @@
     --color-zinc-900: #171717;
     --color-zinc-950: #0a0a0a;
 
+    --color-brand-dark: #1a1a1a;
+    --color-brand-cyan: #00e5ff;
+
     --color-accent: var(--color-neutral-800);
     --color-accent-content: var(--color-neutral-800);
     --color-accent-foreground: var(--color-white);
+}
+
+@theme {
+    /* เปลี่ยนฟอนต์หลักเป็น Noto Sans Thai */
+    --font-sans: 'Noto Sans Thai', ui-sans-serif, system-ui, sans-serif;
+
+    --color-zinc-50: #fafafa;
+    /* ... (โค้ดสีอื่นๆ คงไว้เหมือนเดิม) ... */
 }
 
 @layer theme {
