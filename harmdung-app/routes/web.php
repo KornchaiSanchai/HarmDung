@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CouponController;
 use App\Http\Controllers\MemberController;
 use Illuminate\Support\Facades\Route;
 
@@ -11,7 +12,13 @@ Route::view('/products', 'products')->name('products');
 Route::view('/product-info', 'product-info')->name('product-info');
 
 Route::view('/cart', 'cart')->name('cart');
-Route::view('/checkout', 'checkout')->name('checkout');
+
+// จัดการหน้าชำระเงินและคูปองผ่าน CouponController & CouponService ฝั่ง Backend
+Route::get('/checkout', [CouponController::class, 'checkout'])->name('checkout');
+Route::post('/coupon/apply', [CouponController::class, 'select'])->name('coupon.apply');
+Route::post('/coupon/remove', [CouponController::class, 'remove'])->name('coupon.remove');
+Route::get('/coupon/options', [CouponController::class, 'options'])->name('coupon.options');
+
 Route::view('/payment-success', 'payment-success')->name('payment-success');
 
 Route::view('/member', 'member')->name('member');

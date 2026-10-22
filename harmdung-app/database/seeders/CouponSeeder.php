@@ -52,4 +52,134 @@ class CouponSeeder extends Seeder
 
         return Product::whereIn('platform_id', $platformIds)->pluck('id');
     }
+
+    /**
+     * ดึงรายการคูปองสำหรับหน้า Checkout (จาก Database หรือ Fallback ตาม Seeder)
+     */
+    public static function getCheckoutCoupons(): array
+    {
+        try {
+            if (Coupon::exists()) {
+                return Coupon::all()->map(function (Coupon $coupon) {
+                    $isExpired = $coupon->expiry_date ? $coupon->expiry_date->endOfDay()->isPast() : false;
+                    $isExhausted = (int) $coupon->used_count >= (int) $coupon->usage_limit;
+
+                    $minSpend = (float) ($coupon->min_spend ?? 0);
+                    $desc = ($minSpend > 0)
+                        ? 'ยอดสั่งซื้อขั้นต่ำ ' . number_format($minSpend) . ' บาท'
+                        : 'ไม่มีขั้นต่ำ';
+
+                    if ($isExpired) {
+                        $desc .= ' (หมดอายุแล้ว)';
+                    } elseif ($isExhausted) {
+                        $desc .= ' (สิทธิ์เต็มแล้ว)';
+                    }
+
+                    return [
+                        'code' => $coupon->code,
+                        'name' => 'ส่วนลด ' . rtrim(rtrim(number_format((float) $coupon->discount_percent, 2, '.', ''), '0'), '.') . '%',
+                        'type' => 'percent',
+                        'value' => (float) $coupon->discount_percent,
+                        'min_spend' => $minSpend,
+                        'desc' => $desc,
+                        'is_expired' => $isExpired,
+                        'is_exhausted' => $isExhausted,
+                    ];
+                })->toArray();
+            }
+        } catch (\Throwable $e) {
+            // กรณี query DB ไม่ได้ ให้ใช้ default จาก seeder
+        }
+
+        return self::defaultCheckoutCoupons();
+    }
+
+    /**
+     * ข้อมูลคูปองเริ่มต้นตามที่กำหนดใน CouponSeeder
+     */
+    public static function defaultCheckoutCoupons(): array
+    {
+        return [
+            [
+                'code' => 'SAVE5',
+                'name' => 'ส่วนลด 5%',
+                'type' => 'percent',
+                'value' => 5,
+                'min_spend' => 0,
+                'desc' => 'ไม่มีขั้นต่ำ (ลด 5% ทุกคำสั่งซื้อ)',
+                'is_expired' => false,
+                'is_exhausted' => false,
+            ],
+            [
+                'code' => 'SPEND300',
+                'name' => 'ส่วนลด 10%',
+                'type' => 'percent',
+                'value' => 10,
+                'min_spend' => 300,
+                'desc' => 'ยอดสั่งซื้อขั้นต่ำ 300 บาท',
+                'is_expired' => false,
+                'is_exhausted' => false,
+            ],
+            [
+                'code' => 'SPEND1000',
+                'name' => 'ส่วนลด 20%',
+                'type' => 'percent',
+                'value' => 20,
+                'min_spend' => 1000,
+                'desc' => 'ยอดสั่งซื้อขั้นต่ำ 1,000 บาท',
+                'is_expired' => false,
+                'is_exhausted' => false,
+            ],
+            [
+                'code' => 'NETFLIX15',
+                'name' => 'ส่วนลด 15%',
+                'type' => 'percent',
+                'value' => 15,
+                'min_spend' => 200,
+                'desc' => 'ยอดสั่งซื้อขั้นต่ำ 200 บาท (เฉพาะ Netflix)',
+                'is_expired' => false,
+                'is_exhausted' => false,
+            ],
+            [
+                'code' => 'LONGPLAN25',
+                'name' => 'ส่วนลด 25%',
+                'type' => 'percent',
+                'value' => 25,
+                'min_spend' => 500,
+                'desc' => 'ยอดสั่งซื้อขั้นต่ำ 500 บาท (แพ็กเกจ 90 วันขึ้นไป)',
+                'is_expired' => false,
+                'is_exhausted' => false,
+            ],
+            [
+                'code' => 'EXPIRED30',
+                'name' => 'ส่วนลด 30%',
+                'type' => 'percent',
+                'value' => 30,
+                'min_spend' => 0,
+                'desc' => 'ไม่มีขั้นต่ำ (หมดอายุแล้ว)',
+                'is_expired' => true,
+                'is_exhausted' => false,
+            ],
+            [
+                'code' => 'SOLDOUT20',
+                'name' => 'ส่วนลด 20%',
+                'type' => 'percent',
+                'value' => 20,
+                'min_spend' => 0,
+                'desc' => 'ไม่มีขั้นต่ำ (สิทธิ์เต็มแล้ว)',
+                'is_expired' => false,
+                'is_exhausted' => true,
+            ],
+            [
+                'code' => 'NOPRODUCT5',
+                'name' => 'ส่วนลด 5%',
+                'type' => 'percent',
+                'value' => 5,
+                'min_spend' => 0,
+                'desc' => 'ไม่มีขั้นต่ำ (ไม่มีสินค้าร่วมรายการ)',
+                'is_expired' => false,
+                'is_exhausted' => false,
+            ],
+        ];
+    }
 }
