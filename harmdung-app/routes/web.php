@@ -7,21 +7,17 @@ use Illuminate\Support\Facades\Route;
 Route::redirect('/', '/home');
 Route::view('/home', 'welcome')->name('home');
 
-Route::get('/products', function () {
-    return view('products');
-});
+Route::view('/products', 'products')->name('products');
+Route::view('/product-info', 'product-info')->name('product-info');
 
-Route::get('/cart', function () {
-    return view('cart');
-});
+Route::view('/cart', 'cart')->name('cart');
+Route::view('/checkout', 'checkout')->name('checkout');
+Route::view('/payment-success', 'payment-success')->name('payment-success');
 
-Route::get('/checkout', function () {
-    return view('checkout');
-});
+Route::view('/member', 'member')->name('member');
+Route::view('/movie-details', 'movie-details')->name('movie-details');
 
 // หน้าโปรไฟล์ (Member Info page - 1)
-// ชั่วคราว: เข้าได้โดยไม่ต้องล็อกอิน (ยังไม่ได้ทำระบบ login)
-// TODO: เมื่อทำ login แล้ว ให้ครอบด้วย Route::middleware('auth')->group(...)
 Route::get('/profile', [MemberController::class, 'info'])->name('profile');
 
 Route::middleware(['auth', 'verified'])->group(function () {

@@ -19,6 +19,9 @@
         "@laravel/multiplex": "^0.4.1",
         "@rollup/rollup-linux-x64-gnu": "4.9.5",
         "@tailwindcss/oxide-linux-x64-gnu": "^4.0.1",
-        "lightningcss-linux-x64-gnu": "^1.29.1"
+        "lightningcss-linux-x64-gnu": "^1.29.1",
+        "@voidzero-dev/vite-plus-darwin-arm64": "^1.3.0",
+        "@voidzero-dev/vite-plus-linux-arm64-gnu": "^1.3.0",
+        "@voidzero-dev/vite-plus-linux-x64-gnu": "^1.3.0"
     }
 }
