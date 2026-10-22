@@ -41,9 +41,9 @@
                     <span class="w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center text-black font-bold text-xs">฿</span>
                     100.00
                 </div>
-                <div class="w-10 h-10 bg-[#00E5FF] rounded-full flex items-center justify-center text-black font-bold">
+                <a href="/member" class="w-10 h-10 bg-[#00fff2] rounded-full flex items-center justify-center text-black font-bold shadow-md hover:scale-105 transition" title="ข้อมูลสมาชิก">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                </div>
+                </a>
             </div>
         </nav>
 
@@ -121,9 +121,9 @@
                         <a href="/cart" class="w-full sm:w-auto text-center bg-gray-200 text-black font-bold px-6 py-3 rounded-xl hover:bg-gray-300 transition">
                             ย้อนกลับ
                         </a>
-                        <button class="w-full sm:w-auto bg-[#00E5FF] text-black font-bold px-8 py-3 rounded-xl hover:bg-cyan-300 transition shadow-md">
+                        <a href="/payment-success" class="w-full sm:w-auto text-center bg-[#00fff2] text-black font-bold px-8 py-3 rounded-xl hover:bg-cyan-300 transition shadow-md shadow-cyan-500/20">
                             สั่งซื้อสินค้า
-                        </button>
+                        </a>
                     </div>
                 </div>
 

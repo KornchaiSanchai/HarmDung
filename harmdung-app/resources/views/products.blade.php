@@ -40,10 +40,16 @@
             </div>
         </div>
 
-        <!-- ปุ่มเข้าสู่ระบบ / สมัครสมาชิก -->
+        <!-- ข้อมูลโปรไฟล์ / ยอดเงิน / เข้าสู่ระบบ -->
         <div class="flex items-center gap-4 text-sm font-semibold">
-            <a href="/login" class="bg-white text-black px-6 py-2 rounded-lg hover:bg-gray-200 transition">เข้าสู่ระบบ</a>
-            <a href="/register" class="bg-brand-cyan text-black px-6 py-2 rounded-lg hover:bg-cyan-300 transition">สมัครสมาชิก</a>
+            <div class="bg-gray-800/90 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 border border-gray-700/80 shadow">
+                <span class="w-5 h-5 bg-gradient-to-tr from-yellow-500 to-amber-300 rounded-full flex items-center justify-center text-black font-extrabold text-xs shadow-sm">฿</span>
+                <span class="font-bold text-gray-100">100.00</span>
+            </div>
+            <a href="/member" class="w-10 h-10 bg-[#00fff2] rounded-full flex items-center justify-center text-black font-bold shadow-md hover:scale-105 transition" title="ข้อมูลสมาชิก">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+            </a>
+            <a href="/login" class="bg-white text-black px-5 py-2 rounded-full hover:bg-gray-200 transition font-bold text-xs hidden sm:block">เข้าสู่ระบบ</a>
         </div>
     </nav>
 
@@ -54,23 +60,21 @@
             
             @php
                 $platforms = [
-                    ['name' => 'Thisney-', 'count' => 4, 'bg_class' => 'bg-gradient-to-r from-[#0b1b3d] to-[#043360]', 'image' => '/images/thisney.png'],
-                    ['name' => 'HIV min', 'count' => 4, 'bg_class' => 'bg-gradient-to-r from-[#5a1bb9] to-[#204ce4]', 'image' => '/images/hiv.png'],
-                    ['name' => 'NETFLUX', 'count' => 4, 'bg_class' => 'bg-gradient-to-r from-[#3e0808] to-[#1a0202]', 'image' => '/images/netflux.png'],
-                    ['name' => 'prime hindu video', 'count' => 4, 'bg_class' => 'bg-gradient-to-r from-[#0d213b] to-[#123e6f]', 'image' => '/images/hindu.png'],
+                    ['key' => 'thisney', 'name' => 'Thisney-', 'count' => 4, 'bg_class' => 'bg-gradient-to-r from-[#0b1b3d] to-[#043360]', 'image' => '/images/thisney.png'],
+                    ['key' => 'hiv', 'name' => 'HIV min', 'count' => 4, 'bg_class' => 'bg-gradient-to-r from-[#5a1bb9] to-[#204ce4]', 'image' => '/images/hiv.png'],
+                    ['key' => 'netflux', 'name' => 'NETFLUX', 'count' => 4, 'bg_class' => 'bg-gradient-to-r from-[#3e0808] to-[#1a0202]', 'image' => '/images/netflux.png'],
+                    ['key' => 'hindu', 'name' => 'Prime Hindu Video', 'count' => 4, 'bg_class' => 'bg-gradient-to-r from-[#0d213b] to-[#123e6f]', 'image' => '/images/hindu.png'],
                 ];
             @endphp
 
             @foreach ($platforms as $platform)
             <!-- การ์ดกรอบสีขาว -->
-            <div class="bg-white rounded-[24px] p-3 flex flex-col gap-3 shadow-lg hover:scale-[1.02] transition-transform duration-300 cursor-pointer">
+            <a href="/product-info?platform={{ $platform['key'] }}" class="bg-white rounded-[24px] p-3 flex flex-col gap-3 shadow-lg hover:scale-[1.02] transition-transform duration-300 block">
                 
                 <!-- ส่วนแบนเนอร์ -->
                 <div class="{{ $platform['bg_class'] }} w-full aspect-[21/9] rounded-[20px] flex items-center justify-center overflow-hidden relative">
-                    
                     <!-- ดึงรูปภาพมาแสดงผล -->
                     <img src="{{ $platform['image'] }}" alt="{{ $platform['name'] }}" class="w-full h-full object-cover">
-                    
                 </div>
 
                 <!-- ส่วนรายละเอียดและปุ่ม -->
@@ -79,11 +83,11 @@
                         <h3 class="text-black text-xl font-bold leading-none">{{ $platform['name'] }}</h3>
                         <p class="text-gray-500 text-sm mt-1">มีสินค้า {{ $platform['count'] }} รายการ</p>
                     </div>
-                    <button class="bg-[#00E5FF] text-black font-bold px-5 py-2.5 rounded-full text-sm hover:bg-cyan-300 transition">
+                    <span class="bg-[#00fff2] text-black font-bold px-5 py-2.5 rounded-full text-sm hover:bg-cyan-300 transition shadow-sm">
                         สินค้าทั้งหมด
-                    </button>
+                    </span>
                 </div>
-            </div>
+            </a>
             @endforeach
 
         </div>
