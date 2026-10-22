@@ -37,3 +37,6 @@ yarn-error.log
 /boost.json
 /opencode.json
 /opencode.jsonc
+/node_modules
+/vendor
+.env
