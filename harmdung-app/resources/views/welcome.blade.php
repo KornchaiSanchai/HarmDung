@@ -73,17 +73,22 @@
             </div>
 
             <!-- Profile & Actions matching Figma #17:274 & #5:2 -->
-            <div class="flex items-center gap-4 text-sm font-semibold">
-                <div class="bg-gray-800/90 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 border border-gray-700/80 shadow">
-                    <span class="w-5 h-5 bg-gradient-to-tr from-yellow-500 to-amber-300 rounded-full flex items-center justify-center text-black font-extrabold text-xs shadow-sm">฿</span>
-                    <span class="font-bold text-gray-100">100.00</span>
-                </div>
-                <a href="/member" class="w-10 h-10 bg-[#00fff2] rounded-full flex items-center justify-center text-black font-bold shadow-md hover:scale-105 transition" title="ข้อมูลสมาชิก">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                </a>
-                <a href="/login" class="bg-white text-black px-5 py-2 rounded-full hover:bg-gray-200 transition font-bold text-xs hidden sm:block">เข้าสู่ระบบ</a>
-                <a href="/register" class="bg-[#00fff2] text-black px-5 py-2 rounded-full hover:bg-cyan-300 transition font-bold text-xs hidden sm:block">สมัครสมาชิก</a>
-            </div>
+            <div class="flex items-center gap-4">
+    @auth
+        <div class="bg-gray-800/90 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 border border-gray-700/80 shadow">
+            <span class="w-5 h-5 bg-gradient-to-tr from-yellow-500 to-amber-300 rounded-full flex items-center justify-center text-black font-extrabold text-xs">฿</span>
+            <span class="font-bold text-gray-100">{{ number_format(auth()->user()->balance, 2) }}</span>
+        </div>
+        <a href="{{ route('profile') }}" class="w-10 h-10 bg-[#00fff2] rounded-full flex items-center justify-center text-black shadow-md hover:scale-105 transition" title="โปรไฟล์">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+        </a>
+    @endauth
+
+    @guest
+        <a href="{{ route('login') }}" class="bg-white text-black text-sm font-bold px-5 py-2 rounded-full hover:bg-gray-200 transition">เข้าสู่ระบบ</a>
+        <a href="{{ route('register') }}" class="bg-[#00fff2] text-black text-sm font-bold px-5 py-2 rounded-full hover:bg-cyan-300 transition">สมัครสมาชิก</a>
+    @endguest
+</div>
         </nav>
     </header>
 
