@@ -16,7 +16,7 @@
             <!-- Username matching Figma Group 1 "ชื่อผู้ใช้งาน / Username" -->
             <div class="space-y-1.5">
                 <label class="block text-xs font-bold text-gray-200">ชื่อผู้ใช้งาน / Username</label>
-                <input type="text" name="name" value="{{ old('name') }}" required autofocus autocomplete="name"
+                <input type="text" name="name" value="{{ old('name') }}" required autofocus autocomplete="username"
                        placeholder="ชื่อของคุณ"
                        class="w-full bg-gray-800/90 border border-gray-700 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#00fff2] focus:ring-1 focus:ring-[#00fff2] transition">
                 @error('name')

@@ -20,10 +20,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [MemberController::class, 'info'])->name('profile');
     // ทำ controller รีวิวแล้วค่อยเพิ่ม:
     // Route::post('/movies/{id}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
-});
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::view('dashboard', 'dashboard')->name('dashboard');
+    Route::get('/profile', [MemberController::class, 'info'])->name('profile');
+    Route::patch('/profile', [MemberController::class, 'updateProfile'])->name('member.profile.update');
+    Route::put('/profile/password', [MemberController::class, 'updatePassword'])->name('member.password.update');
 });
 
 require __DIR__.'/settings.php';
