@@ -39,8 +39,6 @@
 
             <!-- Search Bar in Navbar matching Figma Group 1 -->
             <div class="hidden lg:block relative w-80">
-                <input type="text" placeholder="ค้นหาหนัง หรือ แฟลตฟอร์ม" 
-                       class="w-full bg-white text-black pl-5 pr-10 py-2 rounded-full text-xs outline-none focus:ring-2 focus:ring-[#00fff2] placeholder-gray-400">
                 <button class="absolute right-3.5 top-1/2 -translate-y-1/2 text-black">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </button>
@@ -141,6 +139,28 @@
                             <span class="text-xs font-normal text-gray-400">Review</span>
                         </h3>
                     </div>
+
+                    @auth
+                    <form method="POST" action="#" class="bg-gray-900/80 rounded-2xl p-5 border border-gray-800 mb-6 space-y-3">
+                        @csrf
+                        <div class="flex flex-row-reverse justify-end gap-1 text-3xl">
+                            @for ($s = 5; $s >= 1; $s--)
+                                <input type="radio" name="rating" id="star{{ $s }}" value="{{ $s }}" class="peer sr-only" required>
+                                <label for="star{{ $s }}" class="cursor-pointer text-gray-600 peer-checked:text-yellow-400">★</label>
+                            @endfor
+                        </div>
+                        <textarea name="comment" rows="3" required placeholder="เขียนรีวิวของคุณ..."
+                                class="w-full bg-[#171717] border border-gray-700 rounded-xl p-3 text-sm text-white outline-none focus:ring-2 focus:ring-[#00fff2]"></textarea>
+                        <button type="submit" class="bg-[#00fff2] hover:bg-cyan-300 text-black font-extrabold px-6 py-2 rounded-full text-sm transition">ส่งรีวิว</button>
+                    </form>
+                    @endauth
+
+                    @guest
+                    <div class="bg-gray-900/80 rounded-2xl p-5 border border-gray-800 mb-6 flex items-center justify-between gap-4">
+                        <p class="text-sm text-gray-400">เข้าสู่ระบบเพื่อเขียนรีวิวและให้ดาว</p>
+                        <a href="/login" class="bg-[#00fff2] hover:bg-cyan-300 text-black font-bold px-5 py-2 rounded-full text-xs transition shrink-0">เข้าสู่ระบบ</a>
+                    </div>
+                    @endguest
 
                     <div class="space-y-4">
                         <!-- Review 1: userxxx -->
