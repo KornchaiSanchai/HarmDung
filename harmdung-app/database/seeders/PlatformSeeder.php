@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+<<<<<<< Updated upstream
 use App\Models\Platform;
 use Database\Seeders\Concerns\TmdbClient;
 use Illuminate\Database\Seeder;
@@ -31,6 +32,27 @@ class PlatformSeeder extends Seeder
                 ['name' => $p['provider_name']],
                 ['logo_url' => $p['logo_path'] ? self::TMDB_IMG.'w92'.$p['logo_path'] : null]
             );
+=======
+use Illuminate\Database\Seeder;
+use App\Models\Platform;
+
+class PlatformSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        $platforms = [
+            ['name' => 'Netfux'],
+            ['name' => 'Hiv min'],
+            ['name' => 'Prime hindu video'],
+            ['name' => 'Thisney-'],
+        ];
+
+        foreach ($platforms as $platform) {
+            Platform::firstOrCreate($platform);
+>>>>>>> Stashed changes
         }
     }
 }

@@ -8,13 +8,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Product extends Model
 {
-    protected $fillable = ['platform_id', 'plan_name', 'duration_days', 'price', 'stock'];
+    protected $fillable = ['user_id', 'coupon_id', 'subtotal', 'discount_amount', 'total', 'status'];
 
-    protected function casts(): array
-    {
-        return ['price' => 'decimal:2'];
-    }
-
+public function products()
+{
+    return $this->belongsToMany(Product::class, 'order_items')
+        ->withPivot('quantity', 'unit_price');
+}
     public function platform(): BelongsTo
     {
         return $this->belongsTo(Platform::class);

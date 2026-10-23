@@ -6,194 +6,147 @@ use App\Http\Controllers\Controller;
 use App\Models\AccountStock;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\User;
 use App\Services\CouponService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class CheckoutController extends Controller
 {
-    // 1. หน้าสรุปรายการก่อนสั่งซื้อ
-    public function index(Request $request)
+    // สินค้าในตะกร้าที่ติ๊กเลือก (ถ้าไม่ส่ง items[] มาให้ใช้ทั้งตะกร้า)
+    private function selectedItems(Request $request)
     {
-        $user = auth()->user();
-        $cartItems = $user->cartProducts;
+        $ids = array_filter((array) $request->input('items', []));
 
-        if ($cartItems->isEmpty()) {
-            return redirect()->route('cart.index')->with('error', 'ไม่มีสินค้าในตะกร้า');
-        }
-
-        $subtotal = $cartItems->sum(function ($item) {
-            return $item->price * $item->pivot->quantity;
-        });
-
-        // ค่าเริ่มต้นสำหรับ view (แจ้งหมวย: ตัวแปรเพิ่มคือ
-        // $discountAmount, $total, $couponCode, $couponError)
-        $discountAmount = 0;
-        $total = $subtotal;
-        $couponCode = $request->input('coupon_code');
-        $couponError = null;
-
-        if ($request->filled('coupon_code')) {
-            // ==========================================================
-            // [เรียกใช้ของกร] CouponService::validate($code, $user, $cartItems)
-            // - ตรวจเงื่อนไข: โค้ดมีจริง, ไม่หมดอายุ, ยังไม่ใช้ครบจำนวนครั้ง,
-            //   ผูกกับสินค้าในตะกร้า
-            // - คืนค่าถูกต้อง หรือข้อความผิดพลาด
-            //   (TODO: เช็ก format ที่คืนจริงกับกร)
-            // ==========================================================
-            $check = CouponService::validate($couponCode, $user, $cartItems);
-
-            if ($check !== true) {
-                $couponError = is_string($check) ? $check : 'คูปองไม่ถูกต้อง';
-            } else {
-                // ======================================================
-                // [เรียกใช้ของกร] CouponService::apply($code, $cartItems)
-                // - คืนยอดลดและยอดรวม เพื่อโชว์ก่อนกดยืนยัน
-                // - TODO: ยืนยันกับกรว่า key คือ 'discount_amount'
-                // ======================================================
-                $couponResult = CouponService::apply($couponCode, $cartItems);
-                $discountAmount = $couponResult['discount_amount'] ?? 0;
-                $total = max(0, $subtotal - $discountAmount);
-            }
-        }
-
-        return view('commerce.checkout', compact(
-            'cartItems',
-            'subtotal',
-            'discountAmount',
-            'total',
-            'couponCode',
-            'couponError'
-        ));
+        return $request->user()->cartProducts()
+            ->with('platform')
+            ->when($ids, fn ($q) => $q->whereIn('products.id', $ids))
+            ->get();
     }
 
-    // 2. ประมวลผลการสั่งซื้อ (DB Transaction + จัดการ account_stocks + ตัดสต็อก)
-    public function store(Request $request)
+    public function index(Request $request)
     {
-        $user = auth()->user();
-        $cartItems = $user->cartProducts;
+        $user = $request->user();
+        $cartItems = $this->selectedItems($request);
 
         if ($cartItems->isEmpty()) {
             return redirect()->route('cart.index')->with('error', 'ไม่มีสินค้าในตะกร้า');
         }
 
+        $couponService = new CouponService();
+        $couponCode = $request->input('coupon_code');
+        $applied = $couponService->apply($couponCode, $cartItems);
+
+        $couponError = null;
+        if ($couponCode && ! $applied['coupon']) {
+            $validation = $couponService->validate($couponCode, $user, $cartItems);
+            $couponError = $validation['message'] ?? 'คูปองไม่ถูกต้อง';
+        }
+
+        return view('checkout', [
+            'cartItems'      => $cartItems,
+            'subtotal'       => $applied['subtotal'],
+            'discountAmount' => $applied['discount'],
+            'total'          => $applied['total'],
+            'couponCode'     => $couponCode,
+            'couponError'    => $couponError,
+            'selectedIds'    => $cartItems->pluck('id')->all(),
+        ]);
+    }
+
+    public function process(Request $request)
+    {
+        $user = $request->user();
+        $cartItems = $this->selectedItems($request);
+
+        if ($cartItems->isEmpty()) {
+            return redirect()->route('cart.index')->with('error', 'ไม่มีสินค้าในตะกร้า');
+        }
+
+        $couponService = new CouponService();
+
         try {
-            DB::transaction(function () use ($user, $cartItems, $request) {
-                $subtotal = 0;
+            $order = DB::transaction(function () use ($user, $cartItems, $request, $couponService) {
                 $itemsToProcess = [];
 
-                // 1. เช็กและดึง account_stocks ที่พร้อมใช้งานพร้อมล็อกแถวด้วย lockForUpdate()
+                // 1) ล็อกและตรวจสต็อก
                 foreach ($cartItems as $item) {
-                    $product = Product::where('id', $item->id)->lockForUpdate()->first();
-                    $qtyNeeded = $item->pivot->quantity;
+                    $product = Product::whereKey($item->id)->lockForUpdate()->firstOrFail();
+                    $qty = $item->pivot->quantity;
 
-                    // ดึงรายการ account_stocks ที่ยังว่าง (status = available) ตามจำนวนที่สั่ง
-                    $availableAccounts = AccountStock::where('product_id', $product->id)
+                    if ($product->stock < $qty) {
+                        throw new \Exception("สต็อก {$product->plan_name} ไม่เพียงพอ");
+                    }
+
+                    $accounts = AccountStock::where('product_id', $product->id)
                         ->where('status', 'available')
                         ->lockForUpdate()
-                        ->limit($qtyNeeded)
+                        ->limit($qty)
                         ->get();
 
-                    // เช็กว่าจำนวนบัญชีในระบบมีพอตามจำนวนที่ต้องการซื้อหรือไม่
-                    if ($availableAccounts->count() < $qtyNeeded) {
+                    if ($accounts->count() < $qty) {
                         throw new \Exception("สินค้า {$product->plan_name} มีจำนวนบัญชีพร้อมส่งมอบไม่เพียงพอ");
                     }
 
-                    $subtotal += $product->price * $qtyNeeded;
-
-                    $itemsToProcess[] = [
-                        'product' => $product,
-                        'quantity' => $qtyNeeded,
-                        'accounts' => $availableAccounts,
-                    ];
+                    $itemsToProcess[] = compact('product', 'qty', 'accounts');
                 }
 
-                // 2. คำนวณส่วนลดคูปอง (ถ้ามี)
-                $discountAmount = 0;
-                $coupon = null;
-
-                if ($request->filled('coupon_code')) {
-                    // ==========================================================
-                    // [เรียกใช้ของกร] CouponService::validate($code, $user, $cartItems)
-                    // - ตรวจซ้ำใน transaction เพราะระหว่างอยู่หน้า Checkout
-                    //   คูปองอาจหมดอายุหรือถูกคนอื่นใช้ครบไปแล้ว
-                    // - คืนค่าถูกต้อง หรือข้อความผิดพลาด
-                    //   (TODO: เช็ก format ที่คืนจริงกับกร)
-                    // ==========================================================
-                    $check = CouponService::validate($request->coupon_code, $user, $cartItems);
-
-                    if ($check !== true) {
-                        // throw ใน transaction = rollback ทั้งหมด
-                        throw new \Exception(is_string($check) ? $check : 'คูปองไม่ถูกต้อง');
+                // 2) คูปอง
+                $couponCode = $request->input('coupon_code');
+                if (! empty($couponCode)) {
+                    $validation = $couponService->validate($couponCode, $user, $cartItems);
+                    if (! ($validation['valid'] ?? false)) {
+                        throw new \Exception($validation['message'] ?? 'คูปองไม่ถูกต้อง');
                     }
-
-                    // ==========================================================
-                    // [เรียกใช้ของกร] CouponService::apply($code, $cartItems)
-                    // - คืนยอดลดและยอดรวม
-                    // - TODO: ยืนยันกับกรว่า key คือ 'discount_amount' และ 'coupon'
-                    //   (ถ้าชื่อไม่ตรง ส่วนลดจะเป็น 0 เงียบๆ)
-                    // ==========================================================
-                    $couponResult = CouponService::apply($request->coupon_code, $cartItems);
-                    $discountAmount = $couponResult['discount_amount'] ?? 0;
-                    $coupon = $couponResult['coupon'] ?? null;
                 }
 
-                $total = max(0, $subtotal - $discountAmount);
+                $applied = $couponService->apply($couponCode, $cartItems);
+                $coupon = $applied['coupon'];
 
-                // 3. สร้าง Order
+                // 3) หักยอดเงิน (ชำระเงินจำลอง)
+                $lockedUser = User::whereKey($user->id)->lockForUpdate()->first();
+                if ($lockedUser->balance < $applied['total']) {
+                    throw new \Exception('ยอดเงินคงเหลือไม่เพียงพอ');
+                }
+                $lockedUser->decrement('balance', $applied['total']);
+
+                // 4) สร้าง order + order_items
                 $order = Order::create([
-                    'user_id' => $user->id,
-                    'coupon_id' => $coupon ? $coupon->id : null,
-                    'subtotal' => $subtotal,
-                    'discount_amount' => $discountAmount,
-                    'total' => $total,
-                    'status' => 'paid',
+                    'user_id'         => $user->id,
+                    'coupon_id'       => $coupon?->id,
+                    'subtotal'        => $applied['subtotal'],
+                    'discount_amount' => $applied['discount'],
+                    'total'           => $applied['total'],
+                    'status'          => 'paid',
                 ]);
 
-                // 4. บันทึกสินค้าใน Order, ตัดสต็อก และอัปเดตสถานะ account_stocks
-                foreach ($itemsToProcess as $processed) {
-                    $product = $processed['product'];
-                    $qty = $processed['quantity'];
-                    $accounts = $processed['accounts'];
-
-                    // บันทึก Order Item Snapshot
-                    $order->products()->attach($product->id, [
-                        'quantity' => $qty,
-                        'unit_price' => $product->price,
+                // 5) ตัดสต็อก + ผูกบัญชี
+                foreach ($itemsToProcess as $p) {
+                    $order->products()->attach($p['product']->id, [
+                        'quantity'   => $p['qty'],
+                        'unit_price' => $p['product']->price,
                     ]);
 
-                    // ผูกบัญชีเข้ากับ order_id และอัปเดตสถานะเป็น sold
-                    foreach ($accounts as $account) {
-                        $account->update([
-                            'order_id' => $order->id,
-                            'status' => 'sold',
-                        ]);
+                    foreach ($p['accounts'] as $account) {
+                        $account->update(['order_id' => $order->id, 'status' => 'sold']);
                     }
 
-                    // ลดจำนวนสต็อกรวมในตาราง products
-                    $product->decrement('stock', $qty);
+                    $p['product']->decrement('stock', $p['qty']);
                 }
 
-                // 5. บันทึกประวัติการใช้คูปอง
+                // 6) บันทึกการใช้คูปอง
                 if ($coupon) {
-                    // ==========================================================
-                    // [เรียกใช้ของกร] CouponService::recordUsage($coupon, $user, $order)
-                    // - บันทึกลง coupon_usages และเพิ่ม used_count
-                    // - ต้องเรียก "หลังสร้าง order" (ต้องใช้ $order) และ
-                    //   "ใน transaction นี้" เพื่อให้ rollback พร้อมกันถ้าพัง
-                    // - ถ้าคูปองถูกใช้ครบระหว่างนี้ กรควร throw เพื่อ rollback
-                    // ==========================================================
-                    CouponService::recordUsage($coupon, $user, $order);
+                    $couponService->recordUsage($coupon, $user, $order);
                 }
 
-                // 6. ล้างตะกร้าสินค้าของผู้ใช้
-                $user->cartProducts()->detach();
+                // 7) ล้างเฉพาะสินค้าที่ซื้อ
+                $user->cartProducts()->detach($cartItems->pluck('id')->all());
+
+                return $order;
             });
 
-            return redirect()->route('orders.index')->with('success', 'สั่งซื้อสำเร็จเรียบร้อยแล้ว');
-
+            return redirect()->route('payment.success', $order);
         } catch (\Exception $e) {
-            // withInput() เพื่อให้โค้ดคูปองที่กรอกไว้ยังอยู่ในช่องหลังเกิด error
             return redirect()->back()->withInput()->with('error', $e->getMessage());
         }
     }

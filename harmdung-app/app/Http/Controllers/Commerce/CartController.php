@@ -8,56 +8,51 @@ use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
-    // 1. แสดงรายการสินค้าในตะกร้า
-    public function index()
+    public function index(Request $request)
     {
-        $user = auth()->user();
-        $cartItems = $user->cartProducts; // ดึงสินค้าในตะกร้าพร้อมข้อมูล pivot (quantity)
+        $cartItems = $request->user()->cartProducts()->with('platform')->get();
 
-        return view('commerce.cart', compact('cartItems'));
+        return view('cart', compact('cartItems'));
     }
 
-    // 2. เพิ่มสินค้าลงตะกร้า
     public function store(Request $request, $productId)
     {
-        $user = auth()->user();
+        $user = $request->user();
         $product = Product::findOrFail($productId);
-        $qty = $request->input('quantity', 1);
+        $qty = max(1, (int) $request->input('quantity', 1));
 
-        // เช็กว่ามีสินค้านี้ในตะกร้าหรือยัง
-        $existingItem = $user->cartProducts()->where('product_id', $productId)->first();
+        $existing = $user->cartProducts()->where('cart_items.product_id', $product->id)->first();
 
-        if ($existingItem) {
-            // ถ้ามีแล้ว ให้บวกจำนวนเพิ่ม
-            $newQty = $existingItem->pivot->quantity + $qty;
-            $user->cartProducts()->updateExistingPivot($productId, ['quantity' => $newQty]);
+        if ($existing) {
+            $user->cartProducts()->updateExistingPivot($product->id, [
+                'quantity' => $existing->pivot->quantity + $qty,
+            ]);
         } else {
-            // ถ้ายังไม่มี ให้ attach เข้าไปใหม่
-            $user->cartProducts()->attach($productId, ['quantity' => $qty]);
+            $user->cartProducts()->attach($product->id, ['quantity' => $qty]);
         }
 
-        return redirect()->back()->with('success', 'เพิ่มสินค้าลงในตะกร้าเรียบร้อยแล้ว');
+        return back()->with('success', 'เพิ่มสินค้าลงในตะกร้าเรียบร้อยแล้ว');
     }
 
-    // 3. ปรับเปลี่ยนจำนวนสินค้า
     public function update(Request $request, $productId)
     {
-        $request->validate([
-            'quantity' => 'required|integer|min:1', // ต้อง > 0 ตาม constraint
+        $request->validate(['quantity' => 'required|integer|min:1']);
+
+        $request->user()->cartProducts()->updateExistingPivot($productId, [
+            'quantity' => $request->quantity,
         ]);
 
-        auth()->user()->cartProducts()->updateExistingPivot($productId, [
-            'quantity' => $request->quantity
-        ]);
-
-        return redirect()->back()->with('success', 'อัปเดตจำนวนสินค้าเรียบร้อยแล้ว');
+        return $request->wantsJson()
+            ? response()->json(['ok' => true])
+            : back()->with('success', 'อัปเดตจำนวนสินค้าเรียบร้อยแล้ว');
     }
 
-    // 4. ลบสินค้าออกจากตะกร้า
-    public function destroy($productId)
+    public function destroy(Request $request, $productId)
     {
-        auth()->user()->cartProducts()->detach($productId);
+        $request->user()->cartProducts()->detach($productId);
 
-        return redirect()->back()->with('success', 'ลบสินค้าออกจากตะกร้าเรียบร้อยแล้ว');
+        return $request->wantsJson()
+            ? response()->json(['ok' => true])
+            : back()->with('success', 'ลบสินค้าออกจากตะกร้าเรียบร้อยแล้ว');
     }
 }

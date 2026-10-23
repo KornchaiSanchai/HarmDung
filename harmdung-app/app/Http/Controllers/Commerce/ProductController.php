@@ -3,23 +3,28 @@
 namespace App\Http\Controllers\Commerce;
 
 use App\Http\Controllers\Controller;
-use App\Services\ProductService;
+use App\Models\Platform;
+use Illuminate\Http\Request;
 
-/**
- * วางที่ app/Http/Controllers/Commerce/ProductController.php
- *
- * Data contract ของหน้า commerce.products.index (ส่งให้หมวย):
- *   $platform  Platform  แพลตฟอร์มที่เลือก (name, logo_url, ...)
- *   $products  Collection<Product>  plan_name, duration_days, price, stock
- *              stock = 0 ให้แสดงป้าย "หมด" และปิดปุ่มเพิ่มตะกร้า
- */
 class ProductController extends Controller
 {
-    public function byPlatform(int $platform)
+    // หน้าเลือกแพลตฟอร์ม
+    public function index()
     {
-        // findOrFail ข้างใน -> 404 ถ้าไม่มีแพลตฟอร์ม
-        $data = ProductService::platformWithProducts($platform);
+        $platforms = Platform::withCount('products')->get();
 
-        return view('commerce.products.index', $data);
+        return view('products', compact('platforms'));
+    }
+
+    // หน้าแพ็กเกจของแพลตฟอร์ม (รับ ?platform=id หรือชื่อ)
+    public function show(Request $request)
+    {
+        $platform = Platform::where('id', $request->platform)
+            ->orWhere('name', $request->platform)
+            ->firstOrFail();
+
+        $products = $platform->products()->orderBy('price')->get();
+
+        return view('product-info', compact('platform', 'products'));
     }
 }

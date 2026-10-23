@@ -50,4 +50,5 @@ class MemberController extends Controller
         return redirect()->route('profile', ['tab' => 'settings'])
             ->with('status', 'เปลี่ยนรหัสผ่านแล้ว');
     }
+    
 }
