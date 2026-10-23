@@ -39,5 +39,9 @@ class DatabaseSeeder extends Seeder
                 $this->call($seeder);
             }
         }
+
+        $this->call([
+            CouponSeeder::class,
+        ]);
     }
 }
