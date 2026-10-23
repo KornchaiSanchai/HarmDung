@@ -28,36 +28,9 @@
                     <div class="col-span-2 text-right">รายการย่อย</div>
                 </div>
 
-                <!-- รายการสินค้า 1 -->
-                <div class="grid grid-cols-12 items-center py-4 border-b border-gray-100 gap-4 checkout-row" data-price="25">
-                    <div class="col-span-6 flex items-center gap-4">
-                        <div class="w-28 aspect-video rounded-xl overflow-hidden shadow bg-gradient-to-r from-[#0b1b3d] to-[#043360] flex items-center justify-center text-white font-bold text-sm">
-                            Thisney-
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-lg leading-tight">Thisney-</h3>
-                            <p class="text-gray-400 text-xs mt-0.5">ตัวเลือกสินค้า # 7 วัน</p>
-                        </div>
-                    </div>
-                    <div class="col-span-2 text-center font-medium">25 บาท</div>
-                    <div class="col-span-2 text-center font-medium item-qty">2</div>
-                    <div class="col-span-2 text-right font-bold item-subtotal">50 บาท</div>
-                </div>
-
-                <!-- รายการสินค้า 2 -->
-                <div class="grid grid-cols-12 items-center py-4 border-b border-gray-200 gap-4 checkout-row" data-price="70">
-                    <div class="col-span-6 flex items-center gap-4">
-                        <div class="w-28 aspect-video rounded-xl overflow-hidden shadow bg-gradient-to-r from-[#5a1bb9] to-[#204ce4] flex items-center justify-center text-white font-bold text-sm">
-                            HIV min
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-lg leading-tight">HIV min</h3>
-                            <p class="text-gray-400 text-xs mt-0.5">ตัวเลือกสินค้า # 30 วัน</p>
-                        </div>
-                    </div>
-                    <div class="col-span-2 text-center font-medium">70 บาท</div>
-                    <div class="col-span-2 text-center font-medium item-qty">1</div>
-                    <div class="col-span-2 text-right font-bold item-subtotal">70 บาท</div>
+                <!-- รายการสินค้าที่สั่งซื้อ (จะโหลดจากสินค้าที่เลือกในตะกร้า) -->
+                <div id="checkout-items-list">
+                    <!-- รายการสินค้าจะถูกเรนเดอร์จากสินค้าที่ผู้ใช้เลือกในตะกร้าจริงผ่าน JavaScript -->
                 </div>
 
                 <!-- ส่วนเลือกคูปองส่วนลด -->
@@ -85,10 +58,10 @@
                         คำสั่งซื้อทั้งหมด <span id="total-qty" class="text-cyan-600">3</span> ชิ้น : <span id="grand-total" class="text-2xl font-extrabold text-black">108 บาท</span>
                     </div>
                     <div class="flex items-center gap-3 w-full sm:w-auto">
-                        <a href="/cart" class="w-full sm:w-auto text-center bg-gray-200 text-black font-bold px-6 py-3 rounded-xl hover:bg-gray-300 transition">
+                        <a href="/cart" class="w-full sm:w-auto bg-gray-200 text-black font-bold px-6 py-3.5 rounded-full transition shadow-md shadow-gray-500/20 text-base flex items-center justify-center gap-2 cursor-pointer active:scale-95">
                             ย้อนกลับ
                         </a>
-                        <a href="/payment-success" class="w-full sm:w-auto text-center bg-[#00fff2] text-black font-bold px-8 py-3 rounded-xl hover:bg-cyan-300 transition shadow-md shadow-cyan-500/20">
+                        <a href="/payment-success" class="w-full sm:w-auto bg-[#00fff2] hover:bg-cyan-300 text-black font-extrabold px-10 py-3.5 rounded-full transition shadow-lg shadow-cyan-500/25 text-base flex items-center justify-center gap-2 cursor-pointer active:scale-95">
                             สั่งซื้อสินค้า
                         </a>
                     </div>
@@ -99,10 +72,84 @@
     </div>
 
     <script>
-        // คำนวณราคาอัตโนมัติเมื่อโหลดหน้า
+        const PLATFORM_IMAGES = {
+            'Thisney-': '/images/thisney.png',
+            'HIV min': '/images/hiv.png',
+            'NETFLUX': '/images/netflux.png',
+            'Prime Hindu Video': '/images/hindu.png',
+        };
+
+        function platformBanner(name) {
+            const img = PLATFORM_IMAGES[name];
+            return img
+                ? `<img src="${img}" alt="${name}" class="w-full h-full object-cover">`
+                : name; // ไม่มีรูป: แสดงชื่อเป็นข้อความเหมือนเดิม
+        }
+
+        // เมื่อโหลดหน้า: โหลดสินค้าจริงจากที่เลือกในตะกร้า แล้วคำนวณราคาทันที
         window.onload = function() {
+            loadCheckoutItems();
             calculateGrandTotal();
         };
+
+        function loadCheckoutItems() {
+            const raw = localStorage.getItem('harmdung_checkout_items');
+            let items = [];
+            if (raw) {
+                try {
+                    items = JSON.parse(raw);
+                    if (!Array.isArray(items)) items = [];
+                } catch (e) {
+                    items = [];
+                }
+            }
+
+            const container = document.getElementById('checkout-items-list');
+            container.innerHTML = '';
+
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div class="py-12 text-center text-gray-500">
+                        <p class="text-base font-semibold">ไม่มีรายการสินค้าที่เลือกชำระเงิน</p>
+                        <a href="/cart" class="inline-block mt-3 text-sm font-bold text-cyan-600 hover:underline">← กลับไปที่ตะกร้าสินค้า</a>
+                    </div>
+                `;
+                return;
+            }
+
+            // จัดกลุ่มตามชื่อแพลตฟอร์ม (คงลำดับเดิม)
+            const groups = new Map();
+            items.forEach(item => {
+                if (!groups.has(item.name)) groups.set(item.name, []);
+                groups.get(item.name).push(item);
+            });
+
+            groups.forEach((groupItems, name) => {
+                const gradient = groupItems[0].gradient || 'from-[#0b1b3d] to-[#043360]';
+
+                const rowsHtml = groupItems.map(item => `
+                    <div class="checkout-row grid grid-cols-12 items-center py-3 gap-4" data-price="${item.price}">
+                        <div class="col-span-6 pl-32">
+                            <p class="text-gray-400 text-xs">ตัวเลือกสินค้า <span class="text-gray-700 font-medium">${item.option}</span></p>
+                        </div>
+                        <div class="col-span-2 text-center font-medium">${item.price} บาท</div>
+                        <div class="col-span-2 text-center font-medium item-qty">${item.qty}</div>
+                        <div class="col-span-2 text-right font-bold item-subtotal">${item.price * item.qty} บาท</div>
+                    </div>
+                `).join('');
+
+                const group = document.createElement('div');
+                group.className = 'relative py-4 border-b border-gray-200';
+                group.innerHTML = `
+                    <div class="absolute left-0 top-4 w-28 aspect-video rounded-xl overflow-hidden shadow bg-gradient-to-r ${gradient} flex items-center justify-center text-white font-bold text-sm">
+                        ${platformBanner(name)}
+                    </div>
+                    <h3 class="font-bold text-lg leading-tight pl-32">${name}</h3>
+                    <div class="mt-1">${rowsHtml}</div>
+                `;
+                container.appendChild(group);
+            });
+        }
 
         function calculateGrandTotal() {
             const rows = document.querySelectorAll('.checkout-row');
@@ -110,8 +157,8 @@
             let rawTotal = 0;
 
             rows.forEach(row => {
-                const qty = parseInt(row.querySelector('.item-qty').textContent);
-                const unitPrice = parseFloat(row.getAttribute('data-price'));
+                const qty = parseInt(row.querySelector('.item-qty').textContent) || 0;
+                const unitPrice = parseFloat(row.getAttribute('data-price')) || 0;
                 totalQty += qty;
                 rawTotal += (qty * unitPrice);
             });

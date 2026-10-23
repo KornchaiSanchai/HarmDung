@@ -24,11 +24,11 @@
             </div>
 
             <!-- Big Heading from Figma (#40:40) -->
-            <h1 class="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white tracking-tight drop-shadow-md mb-4">
+            <h1 class="text-4xl md:text-6xl lg:text-4xl font-extrabold text-white tracking-tight drop-shadow-md mb-4">
                 ชำระเงินสำเร็จ
             </h1>
             
-            <p class="text-gray-400 text-base md:text-lg max-w-md mx-auto mb-10 leading-relaxed">
+            <p class="text-gray-400 text-base md:text-md max-w-xl mx-auto mb-10 leading-relaxed">
                 ระบบได้ดำเนินการคำสั่งซื้อของคุณเรียบร้อยแล้ว รายการแพ็กเกจของคุณพร้อมใช้งานได้ทันที
             </p>
 
@@ -45,11 +45,5 @@
             </div>
         </div>
     </main>
-
-    <!-- Footer -->
-    <footer class="text-center py-6 text-gray-500 text-xs border-t border-gray-800/50">
-        &copy; {{ date('Y') }} HD Harmdung. All rights reserved.
-    </footer>
-
 </body>
 </html>

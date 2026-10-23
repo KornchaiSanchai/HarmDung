@@ -16,12 +16,11 @@ Route::middleware('auth')->group(function () {
     Route::view('/cart', 'cart')->name('cart');
     Route::view('/checkout', 'checkout')->name('checkout');
     Route::view('/payment-success', 'payment-success')->name('payment-success');
-    Route::view('/member', 'member')->name('member');
+    Route::redirect('/member', '/profile')->name('member');
     Route::get('/profile', [MemberController::class, 'info'])->name('profile');
     // ทำ controller รีวิวแล้วค่อยเพิ่ม:
     // Route::post('/movies/{id}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 
-    Route::get('/profile', [MemberController::class, 'info'])->name('profile');
     Route::patch('/profile', [MemberController::class, 'updateProfile'])->name('member.profile.update');
     Route::put('/profile/password', [MemberController::class, 'updatePassword'])->name('member.password.update');
 });

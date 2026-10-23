@@ -64,12 +64,7 @@
         <!-- Header & Action Bar -->
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-gray-800">
             <div>
-                <h1 class="text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
-                    โปรไฟล์ของคุณ
-                    <span class="text-xs font-semibold px-3 py-1 bg-cyan-950 text-[#00fff2] border border-[#00fff2]/30 rounded-full">
-                        สมาชิกทั่วไป
-                    </span>
-                </h1>
+                <h1 class="text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">โปรไฟล์ของคุณ</h1>
                 <p class="text-gray-400 text-sm mt-1">จัดการข้อมูลส่วนตัว การตั้งค่า และดูประวัติการทำรายการของคุณ</p>
             </div>
 
@@ -110,19 +105,14 @@
         <div id="tab-content-profile" class="tab-pane mt-8">
             <!-- User Overview Card -->
             <div class="bg-gradient-to-r from-gray-900 to-[#1f2937] rounded-[28px] p-8 border border-gray-800 shadow-xl flex flex-col md:flex-row items-center gap-8">
-                <!-- Avatar circle matching Figma Group 11 (#24:468) -->
-                <div class="relative w-32 h-32 rounded-full bg-gradient-to-tr from-[#00fff2] to-cyan-500 p-1 shadow-2xl flex items-center justify-center shrink-0">
-                    <div class="w-full h-full bg-[#171717] rounded-full flex items-center justify-center overflow-hidden">
-                        <img src="/images/avatar.png" alt="User Avatar" class="w-24 h-24 object-contain filter invert opacity-90">
-                    </div>
+                <!-- Avatar circle — ใช้ style เดียวกับ navbar icon ขวาบน -->
+                <div class="w-24 h-24 bg-[#00fff2] rounded-full flex items-center justify-center text-black shadow-lg ring-4 ring-[#00fff2]/30 shrink-0">
+                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                 </div>
 
                 <div class="space-y-3 text-center md:text-left flex-1">
                     <div class="flex flex-col md:flex-row md:items-center gap-3">
                         <h2 class="text-2xl md:text-3xl font-extrabold text-white">{{ $user->name }}</h2>
-                        <span class="inline-flex items-center px-3 py-1 bg-emerald-500/20 text-emerald-400 text-xs font-bold rounded-full w-fit mx-auto md:mx-0 border border-emerald-500/30">
-                            ● ใช้งานอยู่
-                        </span>
                     </div>
                     <p class="text-gray-300 font-medium">{{ $user->email }}</p>
                     
@@ -194,7 +184,7 @@
                class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#00fff2]">
         @error('name') <p class="text-red-400 text-xs">{{ $message }}</p> @enderror
 
-        <label class="block text-xs font-bold text-gray-300">อีเมล / Email <span class="text-amber-400">(เปลี่ยนไม่ได้)</span></label>
+        <label class="block text-xs font-bold text-gray-300">อีเมล / Email <span class="text-red-400">(เปลี่ยนไม่ได้)</span></label>
         <input type="email" value="{{ $user->email }}" disabled
                class="w-full bg-gray-800/50 border border-gray-700/50 rounded-xl px-4 py-3 text-sm text-gray-400 cursor-not-allowed">
 
@@ -345,6 +335,5 @@
             switchTab(initialTab);
         }
     </script>
-
 </body>
 </html>

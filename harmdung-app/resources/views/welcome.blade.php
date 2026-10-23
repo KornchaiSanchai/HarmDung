@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HD Harmdung - แพลตฟอร์มรวมภาพยนตร์และสตรีมมิ่ง</title>
+    <title>HD Harmdung</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -114,7 +114,6 @@
     <div class="mt-14 px-8 max-w-[1300px] mx-auto">
         <h2 class="text-2xl font-black mb-8 text-white flex items-center gap-3">
             <span>หมวดหมู่ / Genre</span>
-            <span class="w-2 h-2 rounded-full bg-[#00fff2]"></span>
         </h2>
 
         @php
@@ -130,7 +129,6 @@
         <div class="mb-12">
             <h3 class="text-lg font-bold text-gray-200 mb-4 flex items-center justify-between">
                 <span>{{ $genre['name'] }}</span>
-                <a href="/products" class="text-xs text-[#00fff2] hover:underline font-semibold">ดูทั้งหมด →</a>
             </h3>
 
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-5">
@@ -138,9 +136,6 @@
                 <a href="/movie-details" class="flex flex-col cursor-pointer group hover:scale-[1.03] transition duration-300">
                     <div class="w-full aspect-[16/10] bg-gradient-to-tr from-gray-900 to-gray-800 rounded-2xl mb-2.5 shadow-lg overflow-hidden relative border border-gray-800 group-hover:border-[#00fff2]/50 transition flex items-center justify-center p-4">
                         <div class="text-center">
-                            <div class="w-8 h-8 mx-auto rounded-full bg-white/10 flex items-center justify-center text-white mb-2 group-hover:bg-[#00fff2] group-hover:text-black transition">
-                                ▶
-                            </div>
                             <span class="text-xs font-bold text-gray-200 line-clamp-1">{{ $mTitle }}</span>
                         </div>
                     </div>
