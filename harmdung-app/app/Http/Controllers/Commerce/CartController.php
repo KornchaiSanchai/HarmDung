@@ -15,33 +15,41 @@ class CartController extends Controller
         return view('cart', compact('cartItems'));
     }
 
+    // รับเฉพาะ id สินค้า ไม่เชื่อราคาจากฟอร์ม
     public function store(Request $request, $productId)
-    {
-        $user = $request->user();
-        $product = Product::findOrFail($productId);
-        $qty = max(1, (int) $request->input('quantity', 1));
+{
+    $user = $request->user();
+    $product = Product::findOrFail($productId);
+    $qty = max(1, (int) $request->input('quantity', 1));
 
-        $existing = $user->cartProducts()->where('cart_items.product_id', $product->id)->first();
+    $available = $product->accountStocks()->where('status', 'available')->count();
+    $current   = $user->cartProducts()->where('cart_items.product_id', $product->id)->first()?->pivot->quantity ?? 0;
 
-        if ($existing) {
-            $user->cartProducts()->updateExistingPivot($product->id, [
-                'quantity' => $existing->pivot->quantity + $qty,
-            ]);
-        } else {
-            $user->cartProducts()->attach($product->id, ['quantity' => $qty]);
-        }
-
-        return back()->with('success', 'เพิ่มสินค้าลงในตะกร้าเรียบร้อยแล้ว');
+    if ($available < 1 || $current + $qty > $available) {
+        return back()->with('error', 'สินค้ามีไม่เพียงพอ คงเหลือ '.$available.' ชิ้น');
     }
 
+    $existing = $user->cartProducts()->where('cart_items.product_id', $product->id)->first();
+
+    if ($existing) {
+        $user->cartProducts()->updateExistingPivot($product->id, [
+            'quantity' => $existing->pivot->quantity + $qty,
+        ]);
+    } else {
+        $user->cartProducts()->attach($product->id, ['quantity' => $qty]);
+    }
+
+    return back()->with('success', 'เพิ่มสินค้าลงในตะกร้าเรียบร้อยแล้ว');
+}
     public function update(Request $request, $productId)
     {
-        $request->validate(['quantity' => 'required|integer|min:1']);
+       $available = \App\Models\AccountStock::where('product_id', $productId)
+    ->where('status', 'available')
+    ->count();
 
-        $request->user()->cartProducts()->updateExistingPivot($productId, [
-            'quantity' => $request->quantity,
-        ]);
-
+    $request->validate([
+    'quantity' => ['required', 'integer', 'min:1', 'max:'.max($available, 1)],
+]);
         return $request->wantsJson()
             ? response()->json(['ok' => true])
             : back()->with('success', 'อัปเดตจำนวนสินค้าเรียบร้อยแล้ว');

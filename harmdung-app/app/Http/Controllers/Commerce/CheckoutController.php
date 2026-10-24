@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Commerce;
 
 use App\Http\Controllers\Controller;
 use App\Models\AccountStock;
+use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
@@ -13,7 +14,6 @@ use Illuminate\Support\Facades\DB;
 
 class CheckoutController extends Controller
 {
-    // สินค้าในตะกร้าที่ติ๊กเลือก (ถ้าไม่ส่ง items[] มาให้ใช้ทั้งตะกร้า)
     private function selectedItems(Request $request)
     {
         $ids = array_filter((array) $request->input('items', []));
@@ -24,59 +24,66 @@ class CheckoutController extends Controller
             ->get();
     }
 
-    public function index(Request $request)
+    public function index(Request $request, CouponService $couponService)
     {
         $user = $request->user();
         $cartItems = $this->selectedItems($request);
 
         if ($cartItems->isEmpty()) {
-            return redirect()->route('cart.index')->with('error', 'ไม่มีสินค้าในตะกร้า');
+            return redirect()->route('cart.index')
+                ->with('error', 'กรุณาเลือกสินค้าที่ต้องการชำระเงินอย่างน้อย 1 รายการ');
         }
 
-        $couponService = new CouponService();
-        $couponCode = $request->input('coupon_code');
-        $applied = $couponService->apply($couponCode, $cartItems);
-
+        $subtotal = $cartItems->sum(fn ($i) => $i->price * $i->pivot->quantity);
+        $discountAmount = 0;
+        $total = $subtotal;
         $couponError = null;
-        if ($couponCode && ! $applied['coupon']) {
-            $validation = $couponService->validate($couponCode, $user, $cartItems);
-            $couponError = $validation['message'] ?? 'คูปองไม่ถูกต้อง';
+        $availableCoupons = Coupon::all();
+
+        $couponCode = $request->input('coupon_code') ?: $request->input('selected_coupon');
+
+        if ($couponCode) {
+            $check = $couponService->validate($couponCode, $user, $cartItems);
+
+            if (! ($check['valid'] ?? false)) {
+                $couponError = $check['message'] ?? 'คูปองไม่ถูกต้อง';
+            } else {
+                $applied = $couponService->apply($couponCode, $cartItems);
+                $discountAmount = $applied['discount'] ?? 0;
+                $total = $applied['total'] ?? $subtotal;
+            }
         }
 
-        return view('checkout', [
-            'cartItems'      => $cartItems,
-            'subtotal'       => $applied['subtotal'],
-            'discountAmount' => $applied['discount'],
-            'total'          => $applied['total'],
-            'couponCode'     => $couponCode,
-            'couponError'    => $couponError,
-            'selectedIds'    => $cartItems->pluck('id')->all(),
-        ]);
+        $selectedIds = $cartItems->pluck('id')->all();
+
+        return view('checkout', compact(
+            'cartItems', 'subtotal', 'discountAmount', 'total',
+            'couponCode', 'couponError', 'availableCoupons', 'selectedIds'
+        ));
     }
 
-    public function process(Request $request)
+    public function process(Request $request, CouponService $couponService)
     {
         $user = $request->user();
         $cartItems = $this->selectedItems($request);
+        $selectedIds = array_filter((array) $request->input('items', []));
 
         if ($cartItems->isEmpty()) {
-            return redirect()->route('cart.index')->with('error', 'ไม่มีสินค้าในตะกร้า');
+            return redirect()->route('cart.index')->with('error', 'ไม่มีสินค้าในตะกร้าสำหรับชำระเงิน');
         }
 
-        $couponService = new CouponService();
+        $couponCode = $request->input('coupon_code') ?: $request->input('selected_coupon');
 
         try {
-            $order = DB::transaction(function () use ($user, $cartItems, $request, $couponService) {
+            $order = DB::transaction(function () use ($user, $cartItems, $couponCode, $couponService) {
                 $itemsToProcess = [];
 
-                // 1) ล็อกและตรวจสต็อก
+                // 1) ล็อกและตรวจสต็อก + บัญชีพร้อมขาย
                 foreach ($cartItems as $item) {
                     $product = Product::whereKey($item->id)->lockForUpdate()->firstOrFail();
                     $qty = $item->pivot->quantity;
 
-                    if ($product->stock < $qty) {
-                        throw new \Exception("สต็อก {$product->plan_name} ไม่เพียงพอ");
-                    }
+                    
 
                     $accounts = AccountStock::where('product_id', $product->id)
                         ->where('status', 'available')
@@ -88,39 +95,45 @@ class CheckoutController extends Controller
                         throw new \Exception("สินค้า {$product->plan_name} มีจำนวนบัญชีพร้อมส่งมอบไม่เพียงพอ");
                     }
 
-                    $itemsToProcess[] = compact('product', 'qty', 'accounts');
+                    $itemsToProcess[] = ['product' => $product, 'qty' => $qty, 'accounts' => $accounts];
                 }
 
-                // 2) คูปอง
-                $couponCode = $request->input('coupon_code');
-                if (! empty($couponCode)) {
-                    $validation = $couponService->validate($couponCode, $user, $cartItems);
-                    if (! ($validation['valid'] ?? false)) {
-                        throw new \Exception($validation['message'] ?? 'คูปองไม่ถูกต้อง');
+                // 2) คำนวณราคา + คูปอง
+                $subtotal = $cartItems->sum(fn ($i) => $i->price * $i->pivot->quantity);
+                $discountAmount = 0;
+                $total = $subtotal;
+                $coupon = null;
+
+                if ($couponCode) {
+                    $check = $couponService->validate($couponCode, $user, $cartItems);
+                    if (! ($check['valid'] ?? false)) {
+                        throw new \Exception($check['message'] ?? 'คูปองไม่ถูกต้อง');
                     }
+
+                    $applied = $couponService->apply($couponCode, $cartItems);
+                    $coupon = $applied['coupon'] ?? Coupon::where('code', $couponCode)->first();
+                    $discountAmount = $applied['discount'] ?? 0;
+                    $total = $applied['total'] ?? $subtotal;
                 }
 
-                $applied = $couponService->apply($couponCode, $cartItems);
-                $coupon = $applied['coupon'];
-
-                // 3) หักยอดเงิน (ชำระเงินจำลอง)
+                // 3) หักเงิน (ล็อกแถวผู้ใช้)
                 $lockedUser = User::whereKey($user->id)->lockForUpdate()->first();
-                if ($lockedUser->balance < $applied['total']) {
+                if ($lockedUser->balance < $total) {
                     throw new \Exception('ยอดเงินคงเหลือไม่เพียงพอ');
                 }
-                $lockedUser->decrement('balance', $applied['total']);
+                $lockedUser->decrement('balance', $total);
 
-                // 4) สร้าง order + order_items
+                // 4) สร้าง order
                 $order = Order::create([
                     'user_id'         => $user->id,
                     'coupon_id'       => $coupon?->id,
-                    'subtotal'        => $applied['subtotal'],
-                    'discount_amount' => $applied['discount'],
-                    'total'           => $applied['total'],
+                    'subtotal'        => $subtotal,
+                    'discount_amount' => $discountAmount,
+                    'total'           => $total,
                     'status'          => 'paid',
                 ]);
 
-                // 5) ตัดสต็อก + ผูกบัญชี
+                // 5) order_items + ผูกบัญชี + ตัดสต็อก
                 foreach ($itemsToProcess as $p) {
                     $order->products()->attach($p['product']->id, [
                         'quantity'   => $p['qty'],
@@ -131,7 +144,7 @@ class CheckoutController extends Controller
                         $account->update(['order_id' => $order->id, 'status' => 'sold']);
                     }
 
-                    $p['product']->decrement('stock', $p['qty']);
+                
                 }
 
                 // 6) บันทึกการใช้คูปอง
@@ -145,9 +158,11 @@ class CheckoutController extends Controller
                 return $order;
             });
 
-            return redirect()->route('payment.success', $order);
+            return redirect()->route('payment.success', $order)
+                ->with('success', 'สั่งซื้อสินค้าเรียบร้อยแล้ว');
         } catch (\Exception $e) {
-            return redirect()->back()->withInput()->with('error', $e->getMessage());
+            return redirect()->route('checkout.index', ['items' => $selectedIds])
+                ->with('error', $e->getMessage());
         }
     }
 }

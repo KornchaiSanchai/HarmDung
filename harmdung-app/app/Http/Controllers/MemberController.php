@@ -50,31 +50,4 @@ class MemberController extends Controller
         return redirect()->route('profile', ['tab' => 'settings'])
             ->with('status', 'เปลี่ยนรหัสผ่านแล้ว');
     }
-
-    public function updateProfile(Request $request)
-    {
-        $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-        ]);
-
-        $request->user()->update($data);
-
-        return redirect()->route('profile', ['tab' => 'settings'])
-            ->with('status', 'บันทึกข้อมูลแล้ว');
-    }
-
-    public function updatePassword(Request $request)
-    {
-        $request->validate([
-            'current_password' => ['required', 'current_password'],
-            'password'         => ['required', 'confirmed', Password::defaults()],
-        ]);
-
-        // cast 'hashed' ใน User model จะเข้ารหัสให้เอง
-        $request->user()->update(['password' => $request->password]);
-
-        return redirect()->route('profile', ['tab' => 'settings'])
-            ->with('status', 'เปลี่ยนรหัสผ่านแล้ว');
-    }
-    
 }

@@ -3,14 +3,18 @@
 namespace App\Http\Controllers\Commerce;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
-
-    public function index()
+    public function index(Request $request)
     {
-        $orders = auth()->user()->orders()->with('products')->latest()->get();
+        $orders = $request->user()
+            ->orders()
+            ->with('products.platform')
+            ->latest()
+            ->get();
 
-        return view('commerce.orders', compact('orders'));
+        return view('orders', compact('orders'));
     }
 }

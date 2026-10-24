@@ -176,18 +176,29 @@ class CouponService
     }
 
     /** ลดได้เฉพาะสินค้าที่ผูกกับคูปองใน coupon_product */
+      /** ลดได้เฉพาะสินค้าที่ผูกกับคูปองใน coupon_product */
     private function eligibleItems(Coupon $coupon, Collection $items): Collection
     {
         $productIds = $coupon->products->pluck('id')->map(fn ($id) => (int) $id);
 
-        return $items->filter(fn ($item) => $productIds->contains((int) data_get($item, 'product_id')));
+        return $items->filter(fn ($item) => $productIds->contains($this->productIdOf($item)));
     }
 
     private function sum(Collection $items): float
     {
         return round($items->sum(
-            fn ($item) => (float) data_get($item, 'price', 0) * (int) data_get($item, 'quantity', 1)
+            fn ($item) => (float) data_get($item, 'price', 0) * $this->quantityOf($item)
         ), 2);
+    }
+
+    private function productIdOf($item): int
+    {
+        return (int) (data_get($item, 'product_id') ?? data_get($item, 'id'));
+    }
+
+    private function quantityOf($item): int
+    {
+        return (int) (data_get($item, 'quantity') ?? data_get($item, 'pivot.quantity', 1));
     }
 
     private function normalize(?string $code): string

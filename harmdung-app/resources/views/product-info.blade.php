@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>รายละเอียดแพ็กเกจ - HD Harmdung</title>
+    <title>{{ $platform->name }} - HD Harmdung</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -11,289 +11,120 @@
 </head>
 <body class="bg-[#171717] text-white font-sans antialiased min-h-screen pb-16 selection:bg-[#00fff2] selection:text-black">
 
-    @php
-        $platformKey = request('platform', 'hiv');
-        $platformsData = [
-            'hiv' => [
-                'name' => 'HIV min',
-                'badge' => 'HIV',
-                'color_gradient' => 'from-[#5a1bb9] to-[#204ce4]',
-                'accent' => '#7c3aed',
-                'description' => 'บริการสตรีมมิ่งความคมชัดระดับ 4K UHD รองรับการรับชมพร้อมกันได้สูงสุด 4 หน้าจอ พร้อมระบบเสียง Dolby Atmos',
-                'image' => '/images/hiv.png',
-                'packages' => [
-                    ['days' => '1 Day', 'price' => 15, 'original' => 20, 'popular' => false],
-                    ['days' => '14 Day', 'price' => 40, 'original' => 55, 'popular' => false],
-                    ['days' => '30 Day', 'price' => 70, 'original' => 99, 'popular' => true],
-                    ['days' => '60 Day', 'price' => 130, 'original' => 180, 'popular' => false],
-                ]
-            ],
-            'thisney' => [
-                'name' => 'Thisney-',
-                'badge' => 'Disney',
-                'color_gradient' => 'from-[#0b1b3d] to-[#043360]',
-                'accent' => '#0284c7',
-                'description' => 'เพลิดเพลินกับภาพยนตร์และซีรีส์สุดเอ็กซ์คลูซีฟจากดิสนีย์ พิกซาร์ มาร์เวล สตาร์ วอร์ส และเนชั่นแนล จีโอกราฟฟิก',
-                'image' => '/images/thisney.png',
-                'packages' => [
-                    ['days' => '1 Day', 'price' => 15, 'original' => 25, 'popular' => false],
-                    ['days' => '7 Day', 'price' => 25, 'original' => 35, 'popular' => false],
-                    ['days' => '30 Day', 'price' => 75, 'original' => 109, 'popular' => true],
-                    ['days' => '60 Day', 'price' => 140, 'original' => 200, 'popular' => false],
-                ]
-            ],
-            'netflux' => [
-                'name' => 'NETFLUX',
-                'badge' => 'Netflix',
-                'color_gradient' => 'from-[#3e0808] to-[#1a0202]',
-                'accent' => '#dc2626',
-                'description' => 'รับชมภาพยนตร์ ซีรีส์ อนิเมะ สารคดี และอีกมากมายได้ไม่อั้น คมชัดระดับ Ultra HD พรีเมียมไร้โฆษณาคั่น',
-                'image' => '/images/netflux.png',
-                'packages' => [
-                    ['days' => '1 Day', 'price' => 19, 'original' => 29, 'popular' => false],
-                    ['days' => '14 Day', 'price' => 59, 'original' => 79, 'popular' => false],
-                    ['days' => '30 Day', 'price' => 99, 'original' => 149, 'popular' => true],
-                    ['days' => '60 Day', 'price' => 189, 'original' => 270, 'popular' => false],
-                ]
-            ],
-            'hindu' => [
-                'name' => 'Prime Hindu Video',
-                'badge' => 'Prime',
-                'color_gradient' => 'from-[#0d213b] to-[#123e6f]',
-                'accent' => '#0284c7',
-                'description' => 'สัมผัสประสบการณ์ความบันเทิงระดับโลก ซีรีส์ Original ยอดฮิต สตรีมได้ทุกที่ทุกเวลาบนทุกอุปกรณ์',
-                'image' => '/images/hindu.png',
-                'packages' => [
-                    ['days' => '1 Day', 'price' => 15, 'original' => 20, 'popular' => false],
-                    ['days' => '14 Day', 'price' => 40, 'original' => 55, 'popular' => false],
-                    ['days' => '30 Day', 'price' => 70, 'original' => 99, 'popular' => true],
-                    ['days' => '60 Day', 'price' => 130, 'original' => 180, 'popular' => false],
-                ]
-            ]
-        ];
-
-        $currentPlatform = $platformsData[$platformKey] ?? $platformsData['hiv'];
-    @endphp
-
     <x-navbar active="product-info"></x-navbar>
 
     <!-- Platform Selector Bar -->
     <div class="max-w-[1240px] mx-auto px-6 mt-8">
         <div class="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none">
-            <a href="/products" class="text-sm font-semibold text-gray-400 hover:text-white transition flex items-center gap-1.5 shrink-0">
+            <a href="{{ route('products') }}" class="text-sm font-semibold text-gray-400 hover:text-white transition flex items-center gap-1.5 shrink-0">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
                 ย้อนกลับ
             </a>
             <span class="text-gray-600">|</span>
-            @foreach ($platformsData as $k => $p)
-                <a href="/product-info?platform={{ $k }}" 
-                   class="px-5 py-2 rounded-full text-sm font-bold transition shrink-0 {{ $platformKey === $k ? 'bg-[#00fff2] text-black shadow-lg shadow-cyan-500/25' : 'bg-gray-800 text-gray-300 hover:bg-gray-700' }}">
-                    {{ $p['name'] }}
+            @foreach ($platforms as $p)
+                <a href="{{ route('product-info', ['platform' => $p->id]) }}"
+                   class="px-5 py-2 rounded-full text-sm font-bold transition shrink-0 {{ $platform->id === $p->id ? 'bg-[#00fff2] text-black shadow-lg shadow-cyan-500/25' : 'bg-gray-800 text-gray-300 hover:bg-gray-700' }}">
+                    {{ $p->name }}
                 </a>
             @endforeach
         </div>
     </div>
 
-    <!-- Platform Hero Section -->
     <main class="max-w-[1240px] mx-auto px-6 mt-6">
-        
-        <!-- Platform Header Card -->
-        <div class="bg-gradient-to-r {{ $currentPlatform['color_gradient'] }} rounded-[28px] p-8 md:p-10 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 border border-white/10">
+
+        @if (session('success'))
+            <div class="mb-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-sm px-4 py-3">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        <!-- Hero -->
+        <div class="bg-gradient-to-r from-[#0b1b3d] to-[#043360] rounded-[28px] p-8 md:p-10 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 border border-white/10">
             <div class="space-y-4 max-w-xl z-10 text-center md:text-left">
                 <div class="inline-flex items-center gap-2 bg-black/40 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold text-cyan-300 border border-white/10">
                     <span class="w-2 h-2 rounded-full bg-[#00fff2] animate-pulse"></span>
                     พร้อมจัดส่งอัตโนมัติ 24 ชม.
                 </div>
-                <h1 class="text-3xl md:text-5xl font-black text-white tracking-tight">
-                    {{ $currentPlatform['name'] }}
-                </h1>
-                <p class="text-gray-200 text-sm md:text-base leading-relaxed opacity-90">
-                    {{ $currentPlatform['description'] }}
-                </p>
+                <h1 class="text-3xl md:text-5xl font-black text-white tracking-tight">{{ $platform->name }}</h1>
             </div>
-            
-            <div class="w-44 h-44 md:w-56 md:h-56 shrink-0 relative flex items-center justify-center">
-                <div class="w-36 h-36 md:w-44 md:h-44 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl flex items-center justify-center overflow-hidden">
-                    <img src="{{ $currentPlatform['image'] }}" alt="{{ $currentPlatform['name'] }}" class="w-full h-full object-cover">
+
+            @if ($platform->logo_url)
+                <div class="w-44 h-44 md:w-56 md:h-56 shrink-0 flex items-center justify-center">
+                    <div class="w-36 h-36 md:w-44 md:h-44 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl flex items-center justify-center overflow-hidden">
+                        <img src="{{ $platform->logo_url }}" alt="{{ $platform->name }}" class="w-full h-full object-cover">
+                    </div>
                 </div>
-            </div>
+            @endif
         </div>
 
-        <!-- Section: Package Options matching Figma #11:128 -->
+        <!-- Packages -->
         <div class="mt-12">
-            <div class="flex items-center justify-between mb-8">
-                <div>
-                    <h2 class="text-2xl font-bold text-white">เลือกแพ็กเกจการใช้งาน</h2>
-                    <p class="text-sm text-gray-400 mt-1">เลือกจำนวนวันที่ต้องการ สั่งซื้อง่าย รับสิทธิ์ดูได้ทันที</p>
-                </div>
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-white">เลือกแพ็กเกจการใช้งาน</h2>
+                <p class="text-sm text-gray-400 mt-1">เลือกแพ็กเกจที่ต้องการ สั่งซื้อง่าย รับสิทธิ์ดูได้ทันที</p>
             </div>
 
-            <!-- Cards Grid: 1 Day, 14 Day, 30 Day, 60 Day -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                @foreach ($currentPlatform['packages'] as $pkg)
-                <div class="bg-white text-black rounded-[24px] p-6 flex flex-col justify-between shadow-xl hover:shadow-2xl hover:scale-[1.02] transition duration-300 relative border border-gray-100">
-                    
-                    @if ($pkg['popular'])
-                    <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#00fff2] text-black font-extrabold text-xs px-4 py-1 rounded-full shadow-md uppercase tracking-wider">
-                        ยอดนิยม 🔥
-                    </div>
-                    @endif
+                @forelse ($products as $product)
+                    <div class="bg-white text-black rounded-[24px] p-6 flex flex-col justify-between shadow-xl hover:shadow-2xl hover:scale-[1.02] transition duration-300 relative border border-gray-100">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-2xl font-black text-gray-900">{{ $product->plan_name }}</span>
+                                <span class="text-xs font-semibold px-2.5 py-1 bg-gray-100 rounded-full text-gray-600">VIP</span>
+                            </div>
 
-                    <div>
-                        <!-- Header / Days -->
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="text-2xl font-black text-gray-900">{{ $pkg['days'] }}</span>
-                            <span class="text-xs font-semibold px-2.5 py-1 bg-gray-100 rounded-full text-gray-600">VIP</span>
-                        </div>
-
-                        <!-- Price -->
-                        <div class="mb-6">
-                            <div class="flex items-baseline gap-2">
-                                <span class="text-4xl font-black text-gray-900">{{ $pkg['price'] }}</span>
+                            <div class="mb-2">
+                                <span class="text-4xl font-black text-gray-900">{{ number_format($product->price, 0) }}</span>
                                 <span class="text-base font-bold text-gray-600">บาท</span>
                             </div>
-                            <span class="text-xs text-gray-400 line-through">ปกติ {{ $pkg['original'] }} บาท</span>
+                            <p class="text-xs mb-6 {{ $product->available_stock > 0 ? 'text-gray-400' : 'text-red-500 font-bold' }}">
+                               {{ $product->available_stock > 0 ? 'คงเหลือ '.$product->available_stock.' ชิ้น' : 'สินค้าหมด' }}
+                            </p>
+
+                            <ul class="space-y-2.5 text-xs text-gray-600 mb-8 border-t border-gray-100 pt-4">
+                                @foreach (['ดูได้ไม่มีโฆษณาคั่น', 'ความละเอียดสูงสุด 4K UHD', 'รับประกันตลอดอายุแพ็กเกจ'] as $feature)
+                                    <li class="flex items-center gap-2">
+                                        <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                                        {{ $feature }}
+                                    </li>
+                                @endforeach
+                            </ul>
                         </div>
 
-                        <!-- Features List -->
-                        <ul class="space-y-2.5 text-xs text-gray-600 mb-8 border-t border-gray-100 pt-4">
-                            <li class="flex items-center gap-2">
-                                <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                                ดูได้ไม่มีโฆษณาคั่น
-                            </li>
-                            <li class="flex items-center gap-2">
-                                <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                                ความละเอียดสูงสุด 4K UHD
-                            </li>
-                            <li class="flex items-center gap-2">
-                                <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                                รับประกันตลอดอายุแพ็กเกจ
-                            </li>
-                        </ul>
+                        <form action="{{ route('cart.add', $product->id) }}" method="POST" class="w-full">
+                            @csrf
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" @disabled($product->available_stock <= 0)
+                                class="w-full bg-[#00fff2] hover:bg-cyan-300 disabled:bg-gray-300 disabled:cursor-not-allowed text-black font-extrabold py-3.5 rounded-full transition shadow-md shadow-cyan-500/20 flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                เพิ่มลงตะกร้า
+                            </button>
+                        </form>
                     </div>
-
-                    <!-- Add to Cart Button matching Figma Cyan Rectangle (#11:128) -->
-                    <button onclick="addToCart('{{ $currentPlatform['name'] }}', '{{ $pkg['days'] }}', {{ $pkg['price'] }}, '{{ $currentPlatform['color_gradient'] }}')" 
-                            class="w-full bg-[#00fff2] hover:bg-cyan-300 text-black font-extrabold py-3.5 rounded-full transition shadow-md shadow-cyan-500/20 flex items-center justify-center gap-2 cursor-pointer active:scale-95">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                        เพิ่มลงตะกร้า
-                    </button>
-                </div>
-                @endforeach
+                @empty
+                    <p class="text-gray-400 col-span-4 text-center">แพลตฟอร์มนี้ยังไม่มีสินค้า</p>
+                @endforelse
             </div>
         </div>
 
-        <!-- Section: App Details & How to Install matching Figma #11:128 Rectangle 76 -->
+        <!-- Detail App -->
         <div class="mt-14 bg-[#202020] rounded-[24px] p-8 md:p-10 border border-gray-800 shadow-xl">
-            <div class="flex items-center gap-3 mb-6">
-                <div class="w-10 h-10 rounded-xl bg-[#00fff2]/10 border border-[#00fff2]/30 flex items-center justify-center text-[#00fff2]">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                </div>
-                <div>
-                    <h3 class="text-xl font-bold text-white">รายละเอียดและวิธีการใช้งานแอปพลิเคชัน (Detail App)</h3>
-                    <p class="text-xs text-gray-400">คำแนะนำการดาวน์โหลด การเข้าสู่ระบบ และการรับประกัน</p>
-                </div>
-            </div>
-
+            <h3 class="text-xl font-bold text-white mb-6">รายละเอียดและวิธีการใช้งานแอปพลิเคชัน</h3>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-gray-300">
                 <div class="bg-[#171717] p-5 rounded-2xl border border-gray-800/80">
-                    <h4 class="font-bold text-white flex items-center gap-2 mb-2">
-                        <span class="w-6 h-6 rounded-full bg-cyan-900/50 text-[#00fff2] flex items-center justify-center text-xs font-bold">1</span>
-                        โหลดได้ที่ไหน?
-                    </h4>
-                    <p class="text-gray-400 text-xs leading-relaxed">
-                        สามารถดาวน์โหลดแอปพลิเคชันได้จาก Google Play Store, Apple App Store, หรือ Smart TV App Store ค้นหาตามชื่อแอปพลิเคชันได้โดยตรง
-                    </p>
+                    <h4 class="font-bold text-white mb-2">1. โหลดได้ที่ไหน?</h4>
+                    <p class="text-gray-400 text-xs leading-relaxed">ดาวน์โหลดจาก Google Play Store, Apple App Store หรือ Smart TV App Store ค้นหาตามชื่อแอปพลิเคชัน</p>
                 </div>
-
                 <div class="bg-[#171717] p-5 rounded-2xl border border-gray-800/80">
-                    <h4 class="font-bold text-white flex items-center gap-2 mb-2">
-                        <span class="w-6 h-6 rounded-full bg-cyan-900/50 text-[#00fff2] flex items-center justify-center text-xs font-bold">2</span>
-                        วิธีรับรหัสเข้าสู่ระบบ
-                    </h4>
-                    <p class="text-gray-400 text-xs leading-relaxed">
-                        เมื่อชำระเงินสำเร็จ สามารถดูบัญชีและรหัสผ่านได้ทันทีที่หน้า "ประวัติการซื้อ" และระบบจะส่งข้อมูลไปยังอีเมลของคุณโดยอัตโนมัติ
-                    </p>
+                    <h4 class="font-bold text-white mb-2">2. วิธีรับรหัสเข้าสู่ระบบ</h4>
+                    <p class="text-gray-400 text-xs leading-relaxed">เมื่อชำระเงินสำเร็จ ดูบัญชีและรหัสผ่านได้ที่หน้า "ประวัติการสั่งซื้อ"</p>
                 </div>
-
                 <div class="bg-[#171717] p-5 rounded-2xl border border-gray-800/80">
-                    <h4 class="font-bold text-white flex items-center gap-2 mb-2">
-                        <span class="w-6 h-6 rounded-full bg-cyan-900/50 text-[#00fff2] flex items-center justify-center text-xs font-bold">3</span>
-                        การรับประกัน & ซัพพอร์ต
-                    </h4>
-                    <p class="text-gray-400 text-xs leading-relaxed">
-                        รับประกันเปลี่ยนแอคเคาท์ใหม่ทันทีหากพบปัญหาตลอดระยะเวลาการใช้งาน ทีมงานพร้อมให้บริการทุกวัน เวลา 09:00 - 24:00 น.
-                    </p>
+                    <h4 class="font-bold text-white mb-2">3. การรับประกัน & ซัพพอร์ต</h4>
+                    <p class="text-gray-400 text-xs leading-relaxed">รับประกันเปลี่ยนแอคเคาท์ใหม่หากพบปัญหาตลอดระยะเวลาการใช้งาน</p>
                 </div>
             </div>
         </div>
-
     </main>
-
-    <!-- Toast Notification for Add to Cart -->
-    <div id="cart-toast" class="fixed bottom-6 right-6 z-50 transform translate-y-32 opacity-0 transition-all duration-300 flex items-center gap-4 bg-gray-900 text-white px-6 py-4 rounded-2xl shadow-2xl border border-[#00fff2]/50">
-        <div class="w-8 h-8 rounded-full bg-[#00fff2] text-black flex items-center justify-center font-bold">✓</div>
-        <div>
-            <div class="font-bold text-sm text-white" id="toast-title">เพิ่มลงตะกร้าสำเร็จ!</div>
-            <div class="text-xs text-gray-400" id="toast-subtitle">คุณสามารถตรวจสอบสินค้าได้ที่ตะกร้า</div>
-        </div>
-        <a href="/cart" class="bg-[#00fff2] text-black text-xs font-bold px-4 py-2 rounded-xl hover:bg-cyan-300 transition">
-            ไปที่ตะกร้า
-        </a>
-    </div>
-
-    <script>
-        function addToCart(platform, days, price, gradient) {
-            // 1. อ่านข้อมูลตะกร้าปัจจุบันจาก localStorage
-            let cart = [];
-            const raw = localStorage.getItem('harmdung_cart_items');
-            if (raw) {
-                try {
-                    cart = JSON.parse(raw);
-                    if (!Array.isArray(cart)) cart = [];
-                } catch (e) {
-                    cart = [];
-                }
-            }
-
-            const daysStr = String(days);
-            const optionText = daysStr.startsWith('#') ? daysStr : '# ' + daysStr;
-            const itemId = (platform + '_' + daysStr).toLowerCase().replace(/[^a-z0-9]/g, '_');
-
-            // ตรวจสอบว่ามีสินค้านี้ในตะกร้าแล้วหรือยัง
-            const existingIndex = cart.findIndex(item => item.name === platform && item.option === optionText);
-
-            if (existingIndex > -1) {
-                cart[existingIndex].qty += 1;
-                cart[existingIndex].checked = true;
-            } else {
-                cart.push({
-                    id: itemId,
-                    name: platform,
-                    option: optionText,
-                    price: parseFloat(price),
-                    qty: 1,
-                    gradient: gradient || 'from-[#0b1b3d] to-[#043360]',
-                    checked: true
-                });
-            }
-
-            // บันทึกลง localStorage ให้หน้า /cart และ /checkout ดึงไปใช้
-            localStorage.setItem('harmdung_cart_items', JSON.stringify(cart));
-
-            // แสดง Toast Notification
-            const toast = document.getElementById('cart-toast');
-            document.getElementById('toast-title').textContent = `เพิ่ม ${platform} (${days}) แล้ว!`;
-            document.getElementById('toast-subtitle').textContent = `ราคา ${price} บาท ถูกเพิ่มไปยังตะกร้าสินค้า`;
-            
-            toast.classList.remove('translate-y-32', 'opacity-0');
-            toast.classList.add('translate-y-0', 'opacity-100');
-            
-            setTimeout(() => {
-                toast.classList.remove('translate-y-0', 'opacity-100');
-                toast.classList.add('translate-y-32', 'opacity-0');
-            }, 4000);
-        }
-    </script>
 </body>
 </html>

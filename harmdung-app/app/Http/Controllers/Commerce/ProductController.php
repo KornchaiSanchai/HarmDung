@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    // หน้าเลือกแพลตฟอร์ม
     public function index()
     {
         $platforms = Platform::withCount('products')->get();
@@ -16,15 +15,33 @@ class ProductController extends Controller
         return view('products', compact('platforms'));
     }
 
-    // หน้าแพ็กเกจของแพลตฟอร์ม (รับ ?platform=id หรือชื่อ)
     public function show(Request $request)
-    {
-        $platform = Platform::where('id', $request->platform)
-            ->orWhere('name', $request->platform)
-            ->firstOrFail();
+{
+    $platforms = Platform::all();
 
-        $products = $platform->products()->orderBy('price')->get();
+    // รองรับ key เก่าจาก mockup ของหมวย
+    $aliases = [
+        'netflux' => 1,
+        'hiv'     => 2,
+        'hindu'   => 3,
+        'thisney' => 4,
+    ];
 
-        return view('product-info', compact('platform', 'products'));
+    $key = $request->input('platform');
+    $id  = $aliases[$key] ?? $key;
+
+    $platform = $platforms->firstWhere('id', (int) $id)
+        ?? $platforms->first(fn ($p) => strcasecmp($p->name, (string) $key) === 0);
+
+    if (! $platform) {
+        return redirect()->route('products');
     }
+
+    $products = $platform->products()
+    ->withCount(['accountStocks as available_stock' => fn ($q) => $q->where('status', 'available')])
+    ->orderBy('price')
+    ->get();
+
+    return view('product-info', compact('platform', 'platforms', 'products'));
+}
 }
