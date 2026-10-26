@@ -38,19 +38,33 @@ class CheckoutController extends Controller
         $discountAmount = 0;
         $total = $subtotal;
         $couponError = null;
-        $availableCoupons = Coupon::all();
+        $appliedCoupon = null;
 
-        $couponCode = $request->input('coupon_code') ?: $request->input('selected_coupon');
+        // ดึงรายการคูปองที่ประเมินเงื่อนไขสำหรับรายการสินค้าในตะกร้านี้
+        $availableCoupons = $couponService->optionsFor($user, $cartItems);
+
+        // รองรับการระบุโค้ด หรือสลับคูปอง หรือล้างคูปอง
+        $rawCoupon = $request->input('coupon_code') ?? $request->input('selected_coupon');
+        if ($request->has('remove_coupon') || $rawCoupon === 'NONE' || $rawCoupon === '') {
+            $couponCode = null;
+        } else {
+            $couponCode = trim((string) $rawCoupon);
+            if ($couponCode === '') {
+                $couponCode = null;
+            }
+        }
 
         if ($couponCode) {
             $check = $couponService->validate($couponCode, $user, $cartItems);
 
             if (! ($check['valid'] ?? false)) {
                 $couponError = $check['message'] ?? 'คูปองไม่ถูกต้อง';
+                $couponCode = null;
             } else {
                 $applied = $couponService->apply($couponCode, $cartItems);
                 $discountAmount = $applied['discount'] ?? 0;
                 $total = $applied['total'] ?? $subtotal;
+                $appliedCoupon = $applied;
             }
         }
 
@@ -58,7 +72,7 @@ class CheckoutController extends Controller
 
         return view('checkout', compact(
             'cartItems', 'subtotal', 'discountAmount', 'total',
-            'couponCode', 'couponError', 'availableCoupons', 'selectedIds'
+            'couponCode', 'couponError', 'availableCoupons', 'selectedIds', 'appliedCoupon'
         ));
     }
 
@@ -72,7 +86,11 @@ class CheckoutController extends Controller
             return redirect()->route('cart.index')->with('error', 'ไม่มีสินค้าในตะกร้าสำหรับชำระเงิน');
         }
 
-        $couponCode = $request->input('coupon_code') ?: $request->input('selected_coupon');
+        $rawCoupon = $request->input('coupon_code') ?? $request->input('selected_coupon');
+        $couponCode = trim((string) $rawCoupon);
+        if ($couponCode === '' || $couponCode === 'NONE') {
+            $couponCode = null;
+        }
 
         try {
             $order = DB::transaction(function () use ($user, $cartItems, $couponCode, $couponService) {

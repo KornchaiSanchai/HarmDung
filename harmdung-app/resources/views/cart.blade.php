@@ -14,30 +14,7 @@
 <body class="bg-[#171717] text-white font-sans antialiased min-h-screen flex flex-col justify-between">
 
 <div>
-    <header>
-        <nav class="flex items-center justify-between px-8 py-4 border-b border-gray-800 bg-[#121212] sticky top-0 z-50">
-            <div class="flex items-center gap-8">
-                <a href="/home">
-                    <img src="/images/logo.png" alt="HD Harmdung" class="h-10 w-auto">
-                </a>
-
-                <div class="flex items-center gap-2">
-                    <a href="/home" class="px-5 py-2 text-sm text-gray-300 rounded-full hover:bg-gray-800">หน้าแรก</a>
-                    <a href="/products" class="px-5 py-2 text-sm text-gray-300 rounded-full hover:bg-gray-800">สินค้าทั้งหมด</a>
-                    <a href="{{ route('cart.index') }}" class="px-5 py-2 bg-[#333] rounded-full text-sm">ตะกร้า</a>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-4">
-                <div class="bg-gray-800 text-white px-4 py-2 rounded-full text-sm font-semibold">
-                    ฿ {{ number_format(auth()->user()->balance ?? 100, 2) }}
-                </div>
-                <a href="/profile" class="w-10 h-10 bg-[#00fff2] rounded-full flex items-center justify-center text-black font-bold">
-                    👤
-                </a>
-            </div>
-        </nav>
-    </header>
+    <x-navbar active="cart"></x-navbar>
 
     <main class="max-w-[1000px] mx-auto px-6 mt-10 w-full">
         <div class="flex items-center justify-between mb-8">
@@ -70,6 +47,7 @@
                     data-id="{{ $item->id }}"
                     data-price="{{ $item->price }}"
                     data-quantity="{{ $item->pivot->quantity }}"
+                    data-stock="{{ $item->available_stock }}"
                 >
                     <div class="flex items-center gap-4">
                         <!-- ใช้ attribute form="checkout-form" เพื่อเชื่อมกับฟอร์มด้านนอก -->
@@ -97,14 +75,14 @@
                                 {{ number_format($item->price, 2) }} บาท
                             </p>
 
-                           <div class="flex items-center gap-2 mt-2">
-    <span class="text-gray-500 text-xs">จำนวน</span>
-    <button type="button" class="qty-btn w-7 h-7 rounded-full bg-gray-200 hover:bg-gray-300 font-bold leading-none cursor-pointer" data-delta="-1">−</button>
-    <span class="item-qty w-6 text-center font-bold text-sm">{{ $item->pivot->quantity }}</span>
-    <button type="button" class="qty-btn w-7 h-7 rounded-full bg-gray-200 hover:bg-gray-300 font-bold leading-none cursor-pointer" data-delta="1">+</button>
-    <span class="text-gray-500 text-xs">ชิ้น</span>
-</div>
-<p class="qty-error text-red-500 text-xs mt-1 hidden"></p>
+                            <div class="flex items-center gap-2 mt-2">
+                                <span class="text-gray-500 text-xs">จำนวน</span>
+                                <button type="button" class="qty-btn w-7 h-7 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-900 font-bold leading-none cursor-pointer flex items-center justify-center" data-delta="-1">−</button>
+                                <span class="item-qty w-6 text-center font-bold text-sm">{{ $item->pivot->quantity }}</span>
+                                <button type="button" class="qty-btn w-7 h-7 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-900 font-bold leading-none cursor-pointer flex items-center justify-center" data-delta="1">+</button>
+                                <span class="text-gray-500 text-xs">ชิ้น</span>
+                            </div>
+                            <p class="qty-error text-rose-500 font-bold text-xs mt-1.5 hidden"></p>
                         </div>
                     </div>
 
@@ -201,41 +179,60 @@
         checkbox.addEventListener('change', updateCartTotal);
     });
     document.querySelectorAll('.qty-btn').forEach(btn => {
-    btn.addEventListener('click', async () => {
-        const item = btn.closest('.cart-item');
-        const errorEl = item.querySelector('.qty-error');
-        const oldQty = Number(item.dataset.quantity);
-        const newQty = oldQty + Number(btn.dataset.delta);
+        btn.addEventListener('click', async () => {
+            const item = btn.closest('.cart-item');
+            const errorEl = item.querySelector('.qty-error');
+            const oldQty = Number(item.dataset.quantity);
+            const delta = Number(btn.dataset.delta);
+            const newQty = oldQty + delta;
+            const stock = item.dataset.stock !== undefined && item.dataset.stock !== '' ? Number(item.dataset.stock) : null;
 
-        errorEl.classList.add('hidden');
-        if (newQty < 1) return; // ลดต่ำกว่า 1 ให้ใช้ปุ่ม "ลบ"
+            errorEl.classList.add('hidden');
+            if (newQty < 1) return; // ลดต่ำกว่า 1 ให้ใช้ปุ่ม "ลบ"
 
-        const res = await fetch(`/cart/update/${item.dataset.id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-            },
-            body: JSON.stringify({ quantity: newQty }),
+            if (delta > 0 && stock !== null && newQty > stock) {
+                errorEl.textContent = 'จำนวนสินค้าใน stock ไม่เพียงพอ';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            btn.disabled = true;
+            try {
+                const res = await fetch(`/cart/update/${item.dataset.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    },
+                    body: JSON.stringify({ quantity: newQty }),
+                });
+
+                if (!res.ok) {
+                    const data = await res.json().catch(() => ({}));
+                    if (data.available !== undefined) {
+                        item.dataset.stock = data.available;
+                    }
+                    errorEl.textContent = data.errors?.quantity?.[0] ?? data.message ?? 'จำนวนสินค้าใน stock ไม่เพียงพอ';
+                    errorEl.classList.remove('hidden');
+                    return;
+                }
+
+                item.dataset.quantity = newQty;
+                item.querySelector('.item-qty').textContent = newQty;
+                item.querySelector('.item-subtotal').textContent =
+                    (Number(item.dataset.price) * newQty).toLocaleString('th-TH', {
+                        minimumFractionDigits: 2, maximumFractionDigits: 2
+                    }) + ' บาท';
+                updateCartTotal();
+            } catch (err) {
+                errorEl.textContent = 'เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่อีกครั้ง';
+                errorEl.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+            }
         });
-
-        if (!res.ok) {
-            const data = await res.json().catch(() => ({}));
-            errorEl.textContent = data.errors?.quantity?.[0] ?? 'ไม่สามารถเปลี่ยนจำนวนได้';
-            errorEl.classList.remove('hidden');
-            return;
-        }
-
-        item.dataset.quantity = newQty;
-        item.querySelector('.item-qty').textContent = newQty;
-        item.querySelector('.item-subtotal').textContent =
-            (Number(item.dataset.price) * newQty).toLocaleString('th-TH', {
-                minimumFractionDigits: 2, maximumFractionDigits: 2
-            }) + ' บาท';
-        updateCartTotal();
     });
-});
 
     updateCartTotal();
 </script>

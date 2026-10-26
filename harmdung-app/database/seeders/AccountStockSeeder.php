@@ -57,13 +57,15 @@ class AccountStockSeeder extends Seeder
                         $query->where('name', 'like', '%' . $item['app_name'] . '%');
                     })
                     ->where('duration_days', $days)
+                    ->where('stock', '>', 0)
                     ->get();
 
                 foreach ($products as $product) {
                     foreach ($emails as $email) {
-                        AccountStock::create([
+                        AccountStock::firstOrCreate([
                             'product_id' => $product->id,
                             'email' => $email,
+                        ], [
                             'password' => 'secret1234', // รหัสผ่านจำลอง
                             'status' => 'available',    // สถานะพร้อมขาย
                         ]);

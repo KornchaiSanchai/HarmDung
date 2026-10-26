@@ -324,7 +324,7 @@ class CouponService
             return $items;
         }
 
-        return $items->filter(fn ($item) => $productIds->contains((int) data_get($item, 'product_id')));
+        return $items->filter(fn ($item) => $productIds->contains($this->productIdOf($item)));
     }
 
     public function sum(Collection $items): float

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $platform->name }} - HD Harmdung</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,12 +32,6 @@
     </div>
 
     <main class="max-w-[1240px] mx-auto px-6 mt-6">
-
-        @if (session('success'))
-            <div class="mb-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-sm px-4 py-3">
-                {{ session('success') }}
-            </div>
-        @endif
 
         <!-- Hero -->
         <div class="bg-gradient-to-r from-[#0b1b3d] to-[#043360] rounded-[28px] p-8 md:p-10 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 border border-white/10">
@@ -91,13 +86,13 @@
                             </ul>
                         </div>
 
-                        <form action="{{ route('cart.add', $product->id) }}" method="POST" class="w-full">
+                        <form action="{{ route('cart.add', $product->id) }}" method="POST" class="add-to-cart-form w-full">
                             @csrf
                             <input type="hidden" name="quantity" value="1">
                             <button type="submit" @disabled($product->available_stock <= 0)
                                 class="w-full bg-[#00fff2] hover:bg-cyan-300 disabled:bg-gray-300 disabled:cursor-not-allowed text-black font-extrabold py-3.5 rounded-full transition shadow-md shadow-cyan-500/20 flex items-center justify-center gap-2 cursor-pointer active:scale-95">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                                เพิ่มลงตะกร้า
+                                <span>เพิ่มลงตะกร้า</span>
                             </button>
                         </form>
                     </div>
@@ -126,5 +121,138 @@
             </div>
         </div>
     </main>
+
+    <!-- Popup ตะกร้าที่มุมขวาล่าง (Cart Toast Popup Container) -->
+    <div id="cartToastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none max-w-sm w-full px-4 sm:px-0"></div>
+
+    <script>
+        function showCartToast(type, message) {
+            const container = document.getElementById('cartToastContainer');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            const isSuccess = type === 'success';
+
+            // Base classes
+            toast.className = `cart-toast pointer-events-auto rounded-2xl p-4 shadow-2xl backdrop-blur-md flex items-start gap-3.5 transform transition-all duration-300 translate-y-4 opacity-0 border ${
+                isSuccess 
+                    ? 'bg-[#122017]/95 border-emerald-500/60 shadow-emerald-950/60 text-white' 
+                    : 'bg-[#251216]/95 border-rose-500/60 shadow-rose-950/60 text-white'
+            }`;
+
+            // Icons
+            const iconSvg = isSuccess
+                ? `<svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>`
+                : `<svg class="w-5 h-5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
+
+            const titleText = isSuccess ? 'เพิ่มลงตะกร้าแล้ว' : 'ไม่สามารถเพิ่มสินค้าได้';
+            const titleColor = isSuccess ? 'text-emerald-400' : 'text-rose-400';
+            const actionBtn = isSuccess
+                ? `<a href="/cart" class="inline-flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-black px-3.5 py-1.5 rounded-full transition shadow-md active:scale-95">
+                        ดูตะกร้าสินค้า
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+                   </a>`
+                : `<a href="/cart" class="inline-flex items-center gap-1.5 bg-rose-500/90 hover:bg-rose-500 text-white text-xs font-bold px-3.5 py-1.5 rounded-full transition shadow-md active:scale-95">
+                        ตรวจสอบตะกร้า
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+                   </a>`;
+
+            toast.innerHTML = `
+                <div class="w-10 h-10 rounded-xl ${isSuccess ? 'bg-emerald-500/20 border border-emerald-500/40' : 'bg-rose-500/20 border border-rose-500/40'} flex items-center justify-center shrink-0">
+                    ${iconSvg}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h4 class="text-sm font-extrabold ${titleColor} flex items-center gap-1.5">
+                        <span>${titleText}</span>
+                        ${isSuccess ? '<svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>' : ''}
+                    </h4>
+                    <p class="text-xs text-gray-200 mt-1 leading-relaxed">${message}</p>
+                    <div class="mt-2.5 flex items-center gap-2">
+                        ${actionBtn}
+                    </div>
+                </div>
+                <button type="button" onclick="closeToast(this.closest('.cart-toast'))" class="text-gray-400 hover:text-white transition p-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            `;
+
+            container.appendChild(toast);
+
+            // Animate in
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-4', 'opacity-0');
+                toast.classList.add('translate-y-0', 'opacity-100');
+            });
+
+            // Auto dismiss after 4.5s
+            const timer = setTimeout(() => {
+                closeToast(toast);
+            }, 4500);
+
+            toast.dataset.timer = timer;
+        }
+
+        function closeToast(toast) {
+            if (!toast) return;
+            if (toast.dataset.timer) clearTimeout(toast.dataset.timer);
+            toast.classList.remove('translate-y-0', 'opacity-100');
+            toast.classList.add('translate-y-4', 'opacity-0');
+            setTimeout(() => {
+                toast.remove();
+            }, 300);
+        }
+
+        // Intercept add to cart form submissions
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.add-to-cart-form').forEach(form => {
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    const originalHtml = submitBtn.innerHTML;
+                    submitBtn.disabled = true;
+                    submitBtn.classList.add('opacity-75');
+
+                    try {
+                        const formData = new FormData(this);
+                        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || formData.get('_token');
+
+                        const response = await fetch(this.action, {
+                            method: 'POST',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken
+                            },
+                            body: formData
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok && data.success) {
+                            showCartToast('success', data.message || 'เพิ่มสินค้าลงในตะกร้าเรียบร้อยแล้ว');
+                        } else {
+                            showCartToast('error', data.message || 'จำนวนสินค้าในตะกร้าเกินจำนวนสินค้าที่มีในสต็อก');
+                        }
+                    } catch (err) {
+                        // If anything unexpected happens with JSON, fallback to standard submission
+                        this.submit();
+                        return;
+                    } finally {
+                        submitBtn.disabled = false;
+                        submitBtn.classList.remove('opacity-75');
+                        submitBtn.innerHTML = originalHtml;
+                    }
+                });
+            });
+
+            // Trigger toast on page reload if flashed from session
+            @if (session('success'))
+                showCartToast('success', "{{ addslashes(session('success')) }}");
+            @endif
+            @if (session('error'))
+                showCartToast('error', "{{ addslashes(session('error')) }}");
+            @endif
+        });
+    </script>
 </body>
 </html>

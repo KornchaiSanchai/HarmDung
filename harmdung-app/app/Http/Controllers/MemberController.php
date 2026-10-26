@@ -12,7 +12,7 @@ class MemberController extends Controller
         $user = $request->user();
 
         $orders = $user->orders()
-            ->with(['products.platform', 'coupon'])
+            ->with(['products.platform', 'coupon', 'accountStocks'])
             ->latest()
             ->get();
 
@@ -41,7 +41,23 @@ class MemberController extends Controller
     {
         $request->validate([
             'current_password' => ['required', 'current_password'],
-            'password'         => ['required', 'confirmed', Password::defaults()],
+            'password'         => [
+                'required',
+                'confirmed',
+                Password::defaults(),
+                'different:current_password',
+                function ($attribute, $value, $fail) use ($request) {
+                    if (\Illuminate\Support\Facades\Hash::check($value, $request->user()->password)) {
+                        $fail('รหัสผ่านใหม่ต้องไม่ตรงกับรหัสผ่านเดิม');
+                    }
+                },
+            ],
+        ], [
+            'current_password.required' => 'กรุณากรอกรหัสผ่านปัจจุบัน',
+            'current_password.current_password' => 'รหัสผ่านปัจจุบันไม่ถูกต้อง',
+            'password.required' => 'กรุณากรอกรหัสผ่านใหม่',
+            'password.confirmed' => 'การยืนยันรหัสผ่านใหม่ไม่ตรงกัน',
+            'password.different' => 'รหัสผ่านใหม่ต้องไม่ตรงกับรหัสผ่านเดิม',
         ]);
 
         // cast 'hashed' ใน User model จะเข้ารหัสให้เอง

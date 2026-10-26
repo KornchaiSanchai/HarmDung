@@ -11,7 +11,7 @@ class OrderController extends Controller
     {
         $orders = $request->user()
             ->orders()
-            ->with('products.platform')
+            ->with(['products.platform', 'accountStocks'])
             ->latest()
             ->get();
 

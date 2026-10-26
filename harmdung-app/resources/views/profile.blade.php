@@ -18,43 +18,7 @@
     $couponOrders = collect($couponOrders ?? []);
 @endphp
     <!-- Navbar -->
-    <header>
-        <nav class="flex items-center justify-between px-8 py-4 border-b border-gray-800/80 bg-[#121212]/80 backdrop-blur-md sticky top-0 z-50">
-            <div class="flex items-center gap-8">
-                <!-- Logo -->
-                <a href="/home" class="flex items-center shrink-0 group">
-                    <img src="/images/logo.png" alt="HD Harmdung" class="h-10 w-auto object-contain scale-125 origin-left transition-transform group-hover:scale-130">
-                </a>
-                
-                <!-- Nav Links -->
-                <div class="flex items-center gap-2">
-                    <a href="/home" class="flex items-center gap-2 px-5 py-2 text-sm text-gray-300 hover:text-white transition rounded-full hover:bg-gray-800/50">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                        หน้าแรก
-                    </a>
-                    <a href="/products" class="flex items-center gap-2 px-5 py-2 text-sm text-gray-300 hover:text-white transition rounded-full hover:bg-gray-800/50">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                        สินค้าทั้งหมด
-                    </a>
-                    <a href="/cart" class="flex items-center gap-2 px-5 py-2 rounded-full text-sm text-gray-300 hover:text-white transition hover:bg-gray-800/50">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                        ตะกร้า
-                    </a>
-                </div>
-            </div>
-
-            <!-- Profile & Balance -->
-            <div class="flex items-center gap-4">
-                <div class="bg-gray-800/90 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 border border-gray-700/80 shadow">
-                    <span class="w-5 h-5 bg-gradient-to-tr from-yellow-500 to-amber-300 rounded-full flex items-center justify-center text-black font-extrabold text-xs shadow-sm">฿</span>
-                    <span class="font-bold text-gray-100">{{ $balance }}</span>
-                </div>
-                <div class="w-10 h-10 bg-[#00fff2] rounded-full flex items-center justify-center text-black font-bold shadow-md ring-2 ring-[#00fff2]/50">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                </div>
-            </div>
-        </nav>
-    </header>
+    <x-navbar active="profile"></x-navbar>
 
     <!-- Main Member Container -->
     <main class="max-w-[1300px] mx-auto px-6 mt-10">
@@ -119,7 +83,10 @@
                     <div class="pt-2 flex flex-wrap items-center justify-center md:justify-start gap-4">
                         <div class="bg-black/40 px-5 py-2.5 rounded-2xl border border-gray-800 flex items-center gap-3">
                             <span class="text-xs text-gray-400">ยอดเงินคงเหลือ:</span>
-                            <span class="text-lg font-black text-[#00fff2]">฿ {{ $balance }}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="w-5 h-5 bg-gradient-to-tr from-yellow-500 to-amber-300 rounded-full flex items-center justify-center text-black font-extrabold text-xs shadow-sm">฿</span>
+                                <span class="text-lg font-black text-[#00fff2]">{{ $balance }}</span>
+                            </div>
                         </div>
                         <div class="bg-black/40 px-5 py-2.5 rounded-2xl border border-gray-800 flex items-center gap-3">
                             <span class="text-xs text-gray-400">คำสั่งซื้อทั้งหมด:</span>
@@ -143,6 +110,7 @@
     @php
         $expires = $order->created_at->copy()->addDays($product->duration_days);
         $daysLeft = (int) now()->diffInDays($expires, false);
+        $accounts = $order->accountStocks->where('product_id', $product->id);
     @endphp
     <div class="bg-white text-black rounded-[24px] p-6 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div class="flex items-center gap-5">
@@ -152,11 +120,22 @@
             <div>
                 <h4 class="text-lg font-extrabold leading-tight">{{ $product->platform->name }}</h4>
                 <p class="text-gray-500 text-xs mt-1">แพ็กเกจ # {{ $product->plan_name }} ({{ $product->duration_days }} วัน)</p>
-                @if ($daysLeft > 0)
-                    <span class="inline-block mt-2 text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full">พร้อมใช้งาน (เหลือ {{ $daysLeft }} วัน)</span>
-                @else
-                    <span class="inline-block mt-2 text-xs font-bold text-gray-600 bg-gray-100 px-2.5 py-0.5 rounded-full">หมดอายุแล้ว</span>
-                @endif
+                <div class="flex flex-wrap items-center gap-2 mt-2">
+                    @if ($daysLeft > 0)
+                        <span class="inline-block text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full">พร้อมใช้งาน (เหลือ {{ $daysLeft }} วัน)</span>
+                    @else
+                        <span class="inline-block text-xs font-bold text-gray-600 bg-gray-100 px-2.5 py-0.5 rounded-full">หมดอายุแล้ว</span>
+                    @endif
+
+                    @if ($accounts->isNotEmpty())
+                        <button type="button" 
+                                onclick="openAccountModal('{{ addslashes($product->platform->name) }}', '{{ addslashes($product->plan_name) }}', 'HD-{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}', {{ json_encode($accounts->values()) }})"
+                                class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-cyan-50 hover:bg-[#00fff2]/20 text-[#0891b2] hover:text-black font-extrabold text-xs transition border border-[#00fff2]/40 shadow-sm active:scale-95 group">
+                            <svg class="w-3.5 h-3.5 text-cyan-600 group-hover:text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+                            <span>ดูไอดีหนัง ({{ $accounts->count() }})</span>
+                        </button>
+                    @endif
+                </div>
             </div>
         </div>
         <div class="text-right">
@@ -219,7 +198,7 @@
         <div id="tab-content-orders" class="tab-pane mt-8 hidden">
             <!-- Search Bar matching Figma Rectangle 9 / text "ค้นหาคำสั่งซื้อ" -->
             <div class="relative max-w-md mb-6">
-                <input type="text" placeholder="ค้นหาคำสั่งซื้อ..." 
+                <input type="text" id="orderSearchInput" oninput="filterOrders(this.value)" placeholder="ค้นหาคำสั่งซื้อหรือแพลตฟอร์ม..." 
                        class="w-full bg-white text-black pl-5 pr-12 py-3 rounded-full text-sm outline-none focus:ring-2 focus:ring-[#00fff2] placeholder-gray-400 shadow-md">
                 <button class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-700">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -228,10 +207,11 @@
 
             <!-- Orders Table Container -->
             <div class="bg-white text-black rounded-[28px] p-8 shadow-2xl overflow-x-auto">
-                <table class="w-full text-left border-collapse min-w-[700px]">
+                <table class="w-full text-left border-collapse min-w-[800px]" id="ordersTable">
                     <thead>
                         <tr class="border-b border-gray-200 text-gray-500 text-xs font-bold uppercase tracking-wider">
                             <th class="py-4 px-4">สินค้าที่ซื้อล่าสุด / Recently Purchased</th>
+                            <th class="py-4 px-4 text-center">ข้อมูลไอดีหนัง / Account</th>
                             <th class="py-4 px-4 text-center">วันที่สั่งซื้อ / Purchased At</th>
                             <th class="py-4 px-4 text-center">จำนวน</th>
                             <th class="py-4 px-4 text-right">ยอดรวม</th>
@@ -242,11 +222,31 @@
                         <!-- Order 1 -->
                         @forelse ($orders as $order)
     @foreach ($order->products as $product)
-        @php $expired = $order->created_at->copy()->addDays($product->duration_days)->isPast(); @endphp
-        <tr class="hover:bg-gray-50/80 transition">
+        @php
+            $expired = $order->created_at->copy()->addDays($product->duration_days)->isPast();
+            $accounts = $order->accountStocks->where('product_id', $product->id);
+        @endphp
+        <tr class="order-row hover:bg-gray-50/80 transition" data-search="{{ strtolower($product->platform->name . ' ' . $product->plan_name . ' ' . $order->id) }}">
             <td class="py-5 px-4">
                 <div class="font-extrabold text-gray-900">{{ $product->platform->name }} (# {{ $product->plan_name }})</div>
                 <div class="text-xs text-gray-400">Order #HD-{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</div>
+            </td>
+            <td class="py-5 px-4 text-center">
+                @if ($accounts->isNotEmpty())
+                    <div class="flex flex-col items-center gap-1">
+                        <button type="button" 
+                                onclick="openAccountModal('{{ addslashes($product->platform->name) }}', '{{ addslashes($product->plan_name) }}', 'HD-{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}', {{ json_encode($accounts->values()) }})"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-cyan-50 hover:bg-[#00fff2]/25 text-[#0891b2] hover:text-black font-extrabold text-xs transition border border-[#00fff2]/40 shadow-sm active:scale-95 group">
+                            <svg class="w-3.5 h-3.5 text-cyan-600 group-hover:text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+                            <span>ดูไอดีหนัง ({{ $accounts->count() }})</span>
+                        </button>
+                        <span class="text-[11px] text-gray-500 font-mono truncate max-w-[150px]">
+                            {{ $accounts->first()->email }}
+                        </span>
+                    </div>
+                @else
+                    <span class="text-xs text-gray-400 italic">ไม่มีข้อมูลไอดี</span>
+                @endif
             </td>
             <td class="py-5 px-4 text-center text-gray-600 font-medium">{{ $order->created_at->format('Y-m-d H:i') }}</td>
             <td class="py-5 px-4 text-center font-bold">{{ $product->pivot->quantity }}</td>
@@ -259,7 +259,7 @@
         </tr>
     @endforeach
 @empty
-    <tr><td colspan="5" class="py-8 text-center text-gray-400">ยังไม่มีประวัติการซื้อ</td></tr>
+    <tr><td colspan="6" class="py-8 text-center text-gray-400">ยังไม่มีประวัติการซื้อ</td></tr>
 @endforelse
                     </tbody>
                 </table>
@@ -303,6 +303,44 @@
 
     </main>
 
+    <!-- Modal ดูข้อมูลไอดีหนัง (Movie Account Modal) -->
+    <div id="accountModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm transition-opacity duration-200">
+        <div class="bg-[#1a1a1a] text-white border border-gray-800 rounded-[28px] max-w-lg w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] flex flex-col transform transition-all duration-200 scale-95 opacity-0" id="accountModalBox">
+            
+            <!-- Header -->
+            <div class="flex items-start justify-between pb-4 border-b border-gray-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-2xl bg-[#00fff2]/10 border border-[#00fff2]/30 flex items-center justify-center text-[#00fff2] shadow-sm">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-extrabold text-white" id="modalPlatformTitle">ข้อมูลไอดีหนัง</h3>
+                        <p class="text-xs text-gray-400 mt-0.5" id="modalOrderSubtitle">Order #HD-00000</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeAccountModal()" class="w-9 h-9 rounded-full bg-gray-800/80 hover:bg-gray-700 text-gray-400 hover:text-white flex items-center justify-center transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <!-- Scrollable Accounts List -->
+            <div class="overflow-y-auto py-4 space-y-4 flex-1 pr-1" id="modalAccountsList">
+                <!-- Dynamically generated account cards -->
+            </div>
+
+            <!-- Footer -->
+            <div class="pt-4 border-t border-gray-800 flex items-center justify-between gap-3">
+                <button type="button" onclick="copyAllAccounts()" id="copyAllBtn" class="px-4 py-2.5 rounded-full text-xs font-bold bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700 transition flex items-center gap-1.5 active:scale-95">
+                    <svg class="w-4 h-4 text-[#00fff2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                    <span>คัดลอกทั้งหมด</span>
+                </button>
+                <button type="button" onclick="closeAccountModal()" class="px-6 py-2.5 rounded-full text-xs font-extrabold bg-[#00fff2] hover:bg-cyan-300 text-black transition active:scale-95 shadow-md shadow-cyan-500/20">
+                    ปิดหน้าต่าง
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         function switchTab(tabKey) {
             // Hide all tab panes
@@ -333,6 +371,139 @@
         const initialTab = urlParams.get('tab');
         if (initialTab && ['profile', 'settings', 'orders', 'coupons'].includes(initialTab)) {
             switchTab(initialTab);
+        }
+
+        // Auto switch to settings tab if validation error occurred
+        @if ($errors->has('current_password') || $errors->has('password') || $errors->has('name'))
+            switchTab('settings');
+        @endif
+
+        // Live filter for orders table
+        function filterOrders(query) {
+            const term = (query || '').toLowerCase().trim();
+            const rows = document.querySelectorAll('#ordersTable tbody .order-row');
+            rows.forEach(row => {
+                const text = row.getAttribute('data-search') || row.textContent.toLowerCase();
+                if (text.includes(term)) {
+                    row.classList.remove('hidden');
+                } else {
+                    row.classList.add('hidden');
+                }
+            });
+        }
+
+        // Account Modal Management
+        let currentAccountsData = [];
+
+        function openAccountModal(platform, plan, orderId, accounts) {
+            currentAccountsData = accounts || [];
+            document.getElementById('modalPlatformTitle').textContent = platform + ' (' + plan + ')';
+            document.getElementById('modalOrderSubtitle').textContent = 'คำสั่งซื้อ ' + orderId + ' · ทั้งหมด ' + currentAccountsData.length + ' บัญชี';
+
+            const container = document.getElementById('modalAccountsList');
+            container.innerHTML = '';
+
+            if (!currentAccountsData || currentAccountsData.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-400">
+                        <p class="text-sm">ไม่พบข้อมูลไอดีหนังสำหรับสินค้านี้ในระบบ</p>
+                    </div>
+                `;
+            } else {
+                currentAccountsData.forEach((acc, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'bg-gray-900/90 border border-gray-800 rounded-2xl p-4 space-y-3';
+                    card.innerHTML = `
+                        <div class="flex items-center justify-between border-b border-gray-800/80 pb-2">
+                            <span class="text-xs font-extrabold text-[#00fff2] flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-[#00fff2] animate-pulse"></span>
+                                บัญชีที่ ${index + 1}
+                            </span>
+                            <span class="text-[11px] font-mono text-gray-400 bg-black/50 border border-gray-800 px-2 py-0.5 rounded">ID: #${acc.id}</span>
+                        </div>
+                        
+                        <!-- Email / Username -->
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-400 mb-1">ไอดี / อีเมล (Email):</label>
+                            <div class="flex items-center gap-2 bg-black/60 border border-gray-700/80 rounded-xl px-3 py-2">
+                                <input type="text" readonly value="${acc.email}" id="acc-email-${index}" class="bg-transparent text-sm text-cyan-300 font-mono w-full outline-none selection:bg-cyan-500 selection:text-black">
+                                <button type="button" onclick="copyText('${acc.email}', this)" class="shrink-0 text-xs px-2.5 py-1 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded-lg transition flex items-center gap-1 font-semibold active:scale-95">
+                                    <svg class="w-3.5 h-3.5 text-[#00fff2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                    <span>คัดลอก</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Password -->
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-400 mb-1">รหัสผ่าน (Password):</label>
+                            <div class="flex items-center gap-2 bg-black/60 border border-gray-700/80 rounded-xl px-3 py-2">
+                                <input type="password" readonly value="${acc.password}" id="acc-pass-${index}" class="bg-transparent text-sm text-gray-100 font-mono w-full outline-none selection:bg-cyan-500 selection:text-black">
+                                <button type="button" onclick="togglePassVisibility('acc-pass-${index}', this)" class="shrink-0 p-1 text-gray-400 hover:text-white transition" title="แสดง/ซ่อนรหัสผ่าน">
+                                    <svg class="w-4 h-4 eye-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                </button>
+                                <button type="button" onclick="copyText('${acc.password}', this)" class="shrink-0 text-xs px-2.5 py-1 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded-lg transition flex items-center gap-1 font-semibold active:scale-95">
+                                    <svg class="w-3.5 h-3.5 text-[#00fff2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                    <span>คัดลอก</span>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            }
+
+            const modal = document.getElementById('accountModal');
+            const box = document.getElementById('accountModalBox');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                box.classList.remove('scale-95', 'opacity-0');
+                box.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeAccountModal() {
+            const modal = document.getElementById('accountModal');
+            const box = document.getElementById('accountModalBox');
+            box.classList.remove('scale-100', 'opacity-100');
+            box.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 150);
+        }
+
+        document.getElementById('accountModal')?.addEventListener('click', function(e) {
+            if (e.target === this) closeAccountModal();
+        });
+
+        function copyText(text, btn) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML = `<span class="text-emerald-400 font-bold">คัดลอกแล้ว! ✓</span>`;
+                setTimeout(() => {
+                    btn.innerHTML = originalHtml;
+                }, 1500);
+            }).catch(err => {
+                console.error('Copy failed:', err);
+            });
+        }
+
+        function togglePassVisibility(inputId, btn) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.innerHTML = `<svg class="w-4 h-4 text-[#00fff2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"></path></svg>`;
+            } else {
+                input.type = 'password';
+                btn.innerHTML = `<svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>`;
+            }
+        }
+
+        function copyAllAccounts() {
+            if (!currentAccountsData || currentAccountsData.length === 0) return;
+            const text = currentAccountsData.map((acc, i) => `[บัญชีที่ ${i + 1}] ID: #${acc.id}\nอีเมล: ${acc.email}\nรหัสผ่าน: ${acc.password}`).join('\n\n');
+            copyText(text, document.getElementById('copyAllBtn'));
         }
     </script>
 </body>
