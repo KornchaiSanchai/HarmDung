@@ -28,9 +28,15 @@
                 ชำระเงินสำเร็จ
             </h1>
             
-            <p class="text-gray-400 text-base md:text-md max-w-xl mx-auto mb-10 leading-relaxed">
+            <p class="text-gray-400 text-base md:text-md max-w-xl mx-auto mb-6 leading-relaxed">
                 ระบบได้ดำเนินการคำสั่งซื้อของคุณเรียบร้อยแล้ว รายการแพ็กเกจของคุณพร้อมใช้งานได้ทันที
             </p>
+
+            <div class="inline-flex items-center gap-3 bg-gray-900/80 border border-gray-700/60 rounded-full px-5 py-2 mb-10 text-sm text-gray-300">
+                <span>หมายเลขคำสั่งซื้อ: <strong class="text-[#00fff2] font-mono">{{ $order->formatted_order_no }}</strong></span>
+                <span class="text-gray-600">|</span>
+                <span>ยอดชำระ: <strong class="text-white">฿{{ $order->formatted_total }}</strong></span>
+            </div>
 
             <!-- Action Buttons -->
             <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">

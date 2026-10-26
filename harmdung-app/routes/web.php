@@ -23,6 +23,7 @@ Route::middleware('auth')->group(function () {
     // ตะกร้า
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add/{product}', [CartController::class, 'store'])->name('cart.add');
+    Route::post('/cart/calculate', [CartController::class, 'calculate'])->name('cart.calculate');
     Route::put('/cart/update/{id}', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/remove/{id}', [CartController::class, 'destroy'])->name('cart.destroy');
 

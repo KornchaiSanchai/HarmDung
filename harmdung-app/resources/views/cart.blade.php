@@ -72,7 +72,7 @@
 
                             <p class="text-gray-500 text-xs mt-1">
                                 ราคาต่อหน่วย:
-                                {{ number_format($item->price, 2) }} บาท
+                                {{ $item->formatted_price }}
                             </p>
 
                             <div class="flex items-center gap-2 mt-2">
@@ -89,7 +89,7 @@
                     <div class="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto">
                         <div class="text-right">
                             <span class="item-subtotal text-lg font-black">
-                                {{ number_format($item->price * $item->pivot->quantity, 2) }} บาท
+                                {{ $item->formatted_subtotal }}
                             </span>
                         </div>
 
@@ -119,9 +119,9 @@
                     <div class="text-xs text-gray-400">สินค้าที่เลือกชำระเงิน</div>
 
                     <div class="text-xl font-black mt-1">
-                        <span id="selected-count" class="text-[#00fff2]">0</span>
+                        <span id="selected-count" class="text-[#00fff2]">{{ $totalCount }}</span>
                         ชิ้น :
-                        <span id="selected-total" class="text-2xl text-[#00fff2]">0.00</span>
+                        <span id="selected-total" class="text-2xl text-[#00fff2]">{{ $formattedTotal }}</span>
                         บาท
                     </div>
                 </div>
@@ -145,39 +145,41 @@
 </footer>
 
 <script>
-    function updateCartTotal() {
-        const items = document.querySelectorAll('.cart-item');
-        let count = 0;
-        let total = 0;
+    // ส่งรายการที่เลือกไปให้ CartController คำนวณยอดเงินและจำนวนจาก Backend โดยตรง
+    async function updateCartTotal() {
+        const checkedBoxes = Array.from(document.querySelectorAll('.item-checkbox:checked'));
+        const selectedIds = checkedBoxes.map(cb => cb.value);
 
-        items.forEach(item => {
-            const checkbox = item.querySelector('.item-checkbox');
-
-            if (checkbox.checked) {
-                const price = Number(item.dataset.price);
-                const quantity = Number(item.dataset.quantity);
-
-                count += quantity;
-                total += price * quantity;
-            }
-        });
-
-        document.getElementById('selected-count').textContent = count;
-        document.getElementById('selected-total').textContent =
-            total.toLocaleString('th-TH', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
+        try {
+            const res = await fetch('{{ route('cart.calculate') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: JSON.stringify({ items: selectedIds }),
             });
 
-        const button = document.getElementById('checkout-button');
-        if (button) {
-            button.disabled = count === 0;
+            if (!res.ok) return;
+            const data = await res.json();
+
+            document.getElementById('selected-count').textContent = data.count;
+            document.getElementById('selected-total').textContent = data.total_formatted;
+
+            const button = document.getElementById('checkout-button');
+            if (button) {
+                button.disabled = !data.can_checkout;
+            }
+        } catch (e) {
+            console.error('Calculate error', e);
         }
     }
 
     document.querySelectorAll('.item-checkbox').forEach(checkbox => {
         checkbox.addEventListener('change', updateCartTotal);
     });
+
     document.querySelectorAll('.qty-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
             const item = btn.closest('.cart-item');
@@ -185,19 +187,13 @@
             const oldQty = Number(item.dataset.quantity);
             const delta = Number(btn.dataset.delta);
             const newQty = oldQty + delta;
-            const stock = item.dataset.stock !== undefined && item.dataset.stock !== '' ? Number(item.dataset.stock) : null;
 
             errorEl.classList.add('hidden');
             if (newQty < 1) return; // ลดต่ำกว่า 1 ให้ใช้ปุ่ม "ลบ"
 
-            if (delta > 0 && stock !== null && newQty > stock) {
-                errorEl.textContent = 'จำนวนสินค้าใน stock ไม่เพียงพอ';
-                errorEl.classList.remove('hidden');
-                return;
-            }
-
             btn.disabled = true;
             try {
+                // ส่งคำขอไปให้ CartController@update ตรวจสต็อกและคำนวณราคาใหม่จาก Database
                 const res = await fetch(`/cart/update/${item.dataset.id}`, {
                     method: 'PUT',
                     headers: {
@@ -218,13 +214,14 @@
                     return;
                 }
 
-                item.dataset.quantity = newQty;
-                item.querySelector('.item-qty').textContent = newQty;
-                item.querySelector('.item-subtotal').textContent =
-                    (Number(item.dataset.price) * newQty).toLocaleString('th-TH', {
-                        minimumFractionDigits: 2, maximumFractionDigits: 2
-                    }) + ' บาท';
-                updateCartTotal();
+                const data = await res.json();
+                item.dataset.quantity = data.quantity;
+                item.querySelector('.item-qty').textContent = data.quantity;
+                // รับยอดรวมย่อยที่คำนวณจาก Controller โดยตรง
+                item.querySelector('.item-subtotal').textContent = data.item_subtotal_text;
+
+                // อัปเดตยอดรวมคำสั่งซื้อผ่าน Controller
+                await updateCartTotal();
             } catch (err) {
                 errorEl.textContent = 'เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่อีกครั้ง';
                 errorEl.classList.remove('hidden');

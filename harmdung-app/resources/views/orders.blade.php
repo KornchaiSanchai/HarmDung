@@ -26,42 +26,39 @@
                     <div class="flex items-center justify-between border-b border-gray-200 pb-3 mb-3">
                         <div>
                             <div class="font-extrabold">คำสั่งซื้อ #{{ $order->id }}</div>
-                            <div class="text-xs text-gray-500">{{ $order->created_at->format('d/m/Y H:i') }}</div>
+                            <div class="text-xs text-gray-500">{{ $order->formatted_date }}</div>
                         </div>
                         <span class="bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full">
-                            {{ $order->status === 'paid' ? 'ชำระแล้ว' : $order->status }}
+                            {{ $order->status_label }}
                         </span>
                     </div>
 
                     @foreach ($order->products as $product)
-                        @php
-                            $accounts = $order->accountStocks->where('product_id', $product->id);
-                        @endphp
                         <div class="flex items-center justify-between py-2 text-sm border-b border-gray-100 last:border-b-0">
                             <div>
                                 <span class="font-bold">{{ $product->platform->name ?? '-' }}</span>
                                 <span class="text-gray-500">· {{ $product->plan_name }}</span>
-                                @if ($accounts->isNotEmpty())
+                                @if ($product->has_accounts)
                                     <div class="mt-1">
                                         <button type="button" 
-                                                onclick="openAccountModal('{{ addslashes($product->platform->name) }}', '{{ addslashes($product->plan_name) }}', '{{ $order->id }}', {{ json_encode($accounts->values()) }})"
+                                                onclick="openAccountModal('{{ addslashes($product->platform->name) }}', '{{ addslashes($product->plan_name) }}', '{{ $order->id }}', {{ json_encode($product->order_accounts) }})"
                                                 class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-50 hover:bg-[#00fff2]/20 text-[#0891b2] hover:text-black font-extrabold text-xs transition border border-[#00fff2]/40 shadow-sm active:scale-95 group">
                                             <svg class="w-3.5 h-3.5 text-cyan-600 group-hover:text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
-                                            <span>ดูไอดีหนัง ({{ $accounts->count() }})</span>
+                                            <span>ดูไอดีหนัง ({{ $product->order_accounts->count() }})</span>
                                         </button>
                                     </div>
                                 @endif
                             </div>
                             <div class="text-gray-600">
-                                {{ $product->pivot->quantity }} × {{ number_format($product->pivot->unit_price, 2) }}
-                                = <span class="font-bold text-black">{{ number_format($product->pivot->quantity * $product->pivot->unit_price, 2) }} บาท</span>
+                                {{ $product->pivot->quantity }} × {{ $product->formatted_unit_price }}
+                                = <span class="font-bold text-black">{{ $product->formatted_subtotal }} บาท</span>
                             </div>
                         </div>
                     @endforeach
 
                     <div class="border-t border-gray-200 mt-3 pt-3 text-sm text-right space-y-1">
-                        <div class="text-gray-500">ส่วนลด: -{{ number_format($order->discount_amount, 2) }} บาท</div>
-                        <div class="text-lg font-extrabold">รวม {{ number_format($order->total, 2) }} บาท</div>
+                        <div class="text-gray-500">ส่วนลด: -{{ $order->formatted_discount }} บาท</div>
+                        <div class="text-lg font-extrabold">รวม {{ $order->formatted_total }} บาท</div>
                     </div>
                 </div>
             @empty

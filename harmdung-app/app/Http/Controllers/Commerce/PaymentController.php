@@ -11,6 +11,12 @@ class PaymentController extends Controller
     {
         abort_unless($order->user_id === auth()->id(), 403);
 
+        $order->load(['orderItems.product']);
+        $order->formatted_order_no = '#HD-' . str_pad($order->id, 5, '0', STR_PAD_LEFT);
+        $order->formatted_total = number_format($order->total_amount, 2);
+        $order->formatted_discount = number_format($order->discount_amount, 2);
+        $order->items_count = $order->orderItems->sum('quantity');
+
         return view('payment-success', compact('order'));
     }
 }

@@ -16,12 +16,33 @@ class MemberController extends Controller
             ->latest()
             ->get();
 
+        // คำนวณสรุปข้อมูลและผูกบัญชีไอดีหนังทั้งหมดจาก Controller
+        $orders->each(function ($order) {
+            $order->formatted_date = $order->created_at->format('d/m/Y H:i');
+            $order->status_label = $order->status === 'paid' ? 'ชำระแล้ว' : $order->status;
+            $order->formatted_total = number_format($order->total, 2);
+            $order->formatted_discount = number_format($order->discount_amount, 2);
+
+            $order->products->each(function ($product) use ($order) {
+                $product->order_accounts = $order->accountStocks->where('product_id', $product->id)->values();
+                $product->has_accounts = $product->order_accounts->isNotEmpty();
+                $product->formatted_unit_price = number_format($product->pivot->unit_price, 2);
+                $product->formatted_subtotal = number_format($product->pivot->quantity * $product->pivot->unit_price, 2);
+            });
+        });
+
+        $formattedBalance = number_format($user->balance, 2);
+        $orderCount = $orders->count();
+        $recentOrders = $orders->take(2)->values();
+        $couponOrders = $orders->whereNotNull('coupon_id')->values();
+
         return view('profile', [
-            'user'         => $user,
-            'orders'       => $orders,
-            'recentOrders' => $orders->take(2),
-            'couponOrders' => $orders->whereNotNull('coupon_id'),
-            'orderCount'   => $orders->count(),
+            'user'             => $user,
+            'orders'           => $orders,
+            'recentOrders'     => $recentOrders,
+            'couponOrders'     => $couponOrders,
+            'orderCount'       => $orderCount,
+            'formattedBalance' => $formattedBalance,
         ]);
     }
 

@@ -10,9 +10,52 @@ class CartController extends Controller
 {
     public function index(Request $request)
     {
-        $cartItems = $request->user()->cartProducts()->with('platform')->get();
+        $user = $request->user();
+        $cartItems = $user->cartProducts()->with('platform')->get();
 
-        return view('cart', compact('cartItems'));
+        // คำนวณสรุปราคาและจำนวนสินค้าจาก Backend ทั้งหมด
+        $cartItems->each(function ($item) {
+            $item->subtotal = $item->price * $item->pivot->quantity;
+            $item->formatted_price = number_format($item->price, 2) . ' บาท';
+            $item->formatted_subtotal = number_format($item->subtotal, 2) . ' บาท';
+            $item->current_stock = $item->available_stock;
+        });
+
+        $totalCount = $cartItems->sum(fn ($i) => $i->pivot->quantity);
+        $totalAmount = $cartItems->sum(fn ($i) => $i->subtotal);
+        $formattedTotal = number_format($totalAmount, 2);
+
+        return view('cart', compact('cartItems', 'totalCount', 'totalAmount', 'formattedTotal'));
+    }
+
+    // คำนวณยอดเงินและจำนวนสินค้าตามรายการ checkbox ที่ผู้ใช้เลือก
+    public function calculate(Request $request)
+    {
+        $user = $request->user();
+        $selectedIds = array_filter((array) $request->input('items', []));
+
+        if (empty($selectedIds)) {
+            return response()->json([
+                'count'           => 0,
+                'total'           => 0.00,
+                'total_formatted' => '0.00',
+                'can_checkout'    => false,
+            ]);
+        }
+
+        $items = $user->cartProducts()
+            ->whereIn('products.id', $selectedIds)
+            ->get();
+
+        $count = $items->sum(fn ($i) => $i->pivot->quantity);
+        $total = $items->sum(fn ($i) => $i->price * $i->pivot->quantity);
+
+        return response()->json([
+            'count'           => $count,
+            'total'           => $total,
+            'total_formatted' => number_format($total, 2),
+            'can_checkout'    => $count > 0,
+        ]);
     }
 
     // รับเฉพาะ id สินค้า ไม่เชื่อราคาจากฟอร์ม
@@ -58,6 +101,7 @@ class CartController extends Controller
 
         return back()->with('success', $successMsg);
     }
+
     public function update(Request $request, $productId)
     {
         $product = Product::findOrFail($productId);
@@ -80,13 +124,33 @@ class CartController extends Controller
             'quantity' => ['required', 'integer', 'min:1'],
         ]);
 
-        $request->user()->cartProducts()->updateExistingPivot($productId, [
+        $user = $request->user();
+        $user->cartProducts()->updateExistingPivot($productId, [
             'quantity' => $qty,
         ]);
 
-        return $request->wantsJson() || $request->ajax()
-            ? response()->json(['ok' => true, 'message' => 'อัปเดตจำนวนสินค้าเรียบร้อยแล้ว'])
-            : back()->with('success', 'อัปเดตจำนวนสินค้าเรียบร้อยแล้ว');
+        // คำนวณยอดเงินและรายการสรุปใหม่จาก Backend
+        $itemSubtotal = $product->price * $qty;
+        $updatedCartItems = $user->cartProducts()->get();
+        $cartTotal = $updatedCartItems->sum(fn ($i) => $i->price * $i->pivot->quantity);
+        $cartCount = $updatedCartItems->sum(fn ($i) => $i->pivot->quantity);
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'ok'                    => true,
+                'message'               => 'อัปเดตจำนวนสินค้าเรียบร้อยแล้ว',
+                'product_id'            => $product->id,
+                'quantity'              => $qty,
+                'available_stock'       => $available,
+                'item_subtotal'         => $itemSubtotal,
+                'item_subtotal_text'    => number_format($itemSubtotal, 2) . ' บาท',
+                'cart_total'            => $cartTotal,
+                'cart_total_formatted'  => number_format($cartTotal, 2),
+                'cart_count'            => $cartCount,
+            ]);
+        }
+
+        return back()->with('success', 'อัปเดตจำนวนสินค้าเรียบร้อยแล้ว');
     }
 
     public function destroy(Request $request, $productId)

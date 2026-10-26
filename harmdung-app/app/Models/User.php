@@ -62,6 +62,11 @@ class User extends Authenticatable implements PasskeyUser
             : $initials;
     }
 
+    public function getFormattedBalanceAttribute(): string
+    {
+        return number_format((float) ($this->balance ?? 0), 2);
+    }
+
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);

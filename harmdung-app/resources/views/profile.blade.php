@@ -10,13 +10,6 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-[#171717] text-white font-sans antialiased min-h-screen pb-16 selection:bg-[#00fff2] selection:text-black">
-    @php
-    $user = auth()->user();
-    $balance = number_format($user->balance, 2);
-    $orders = collect($orders ?? []);
-    $recentOrders = collect($recentOrders ?? []);
-    $couponOrders = collect($couponOrders ?? []);
-@endphp
     <!-- Navbar -->
     <x-navbar active="profile"></x-navbar>
 
@@ -85,12 +78,12 @@
                             <span class="text-xs text-gray-400">ยอดเงินคงเหลือ:</span>
                             <div class="flex items-center gap-2">
                                 <span class="w-5 h-5 bg-gradient-to-tr from-yellow-500 to-amber-300 rounded-full flex items-center justify-center text-black font-extrabold text-xs shadow-sm">฿</span>
-                                <span class="text-lg font-black text-[#00fff2]">{{ $balance }}</span>
+                                <span class="text-lg font-black text-[#00fff2]">{{ $formattedBalance }}</span>
                             </div>
                         </div>
                         <div class="bg-black/40 px-5 py-2.5 rounded-2xl border border-gray-800 flex items-center gap-3">
                             <span class="text-xs text-gray-400">คำสั่งซื้อทั้งหมด:</span>
-                            <span class="text-lg font-black text-white">{{ $orders->count() }} รายการ</span>
+                            <span class="text-lg font-black text-white">{{ $orderCount }} รายการ</span>
                         </div>
                     </div>
                 </div>

@@ -69,11 +69,11 @@
                             </div>
 
                             <div class="mb-2">
-                                <span class="text-4xl font-black text-gray-900">{{ number_format($product->price, 0) }}</span>
+                                <span class="text-4xl font-black text-gray-900">{{ $product->formatted_price }}</span>
                                 <span class="text-base font-bold text-gray-600">บาท</span>
                             </div>
-                            <p class="text-xs mb-6 {{ $product->available_stock > 0 ? 'text-gray-400' : 'text-red-500 font-bold' }}">
-                               {{ $product->available_stock > 0 ? 'คงเหลือ '.$product->available_stock.' ชิ้น' : 'สินค้าหมด' }}
+                            <p class="text-xs mb-6 {{ $product->is_in_stock ? 'text-gray-400' : 'text-red-500 font-bold' }}">
+                                {{ $product->stock_label }}
                             </p>
 
                             <ul class="space-y-2.5 text-xs text-gray-600 mb-8 border-t border-gray-100 pt-4">
@@ -89,7 +89,7 @@
                         <form action="{{ route('cart.add', $product->id) }}" method="POST" class="add-to-cart-form w-full">
                             @csrf
                             <input type="hidden" name="quantity" value="1">
-                            <button type="submit" @disabled($product->available_stock <= 0)
+                            <button type="submit" @disabled(!$product->is_in_stock)
                                 class="w-full bg-[#00fff2] hover:bg-cyan-300 disabled:bg-gray-300 disabled:cursor-not-allowed text-black font-extrabold py-3.5 rounded-full transition shadow-md shadow-cyan-500/20 flex items-center justify-center gap-2 cursor-pointer active:scale-95">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                                 <span>เพิ่มลงตะกร้า</span>

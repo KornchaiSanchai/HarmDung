@@ -11,6 +11,7 @@ class MovieController extends Controller
     /** หน้า /movie-details?id={movie_id} */
     public function show(Request $request): View
     {
+        $user = $request->user();
         $movie = Movie::query()
             ->with([
                 'genres',
@@ -20,6 +21,12 @@ class MovieController extends Controller
             ->withRatingStats()
             ->findOrFail($request->integer('id'));
 
-        return view('movie-details', compact('movie'));
+        // ประเมินสถานะรีวิวและคะแนนจาก Controller โดยตรง
+        $userReview = $user ? $movie->reviews->firstWhere('user_id', $user->id) : null;
+        $hasReviewed = $userReview !== null;
+        $ratingFormatted = $movie->reviews_count ? number_format($movie->reviews_avg_rating, 1) : '-';
+        $genresText = $movie->genres->pluck('name')->implode(' / ');
+
+        return view('movie-details', compact('movie', 'userReview', 'hasReviewed', 'ratingFormatted', 'genresText'));
     }
 }
