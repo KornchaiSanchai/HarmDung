@@ -95,7 +95,7 @@ class CartController extends Controller
             return response()->json([
                 'success'    => true,
                 'message'    => $successMsg,
-                'cart_count' => $user->cartProducts()->count(),
+                'cart_count' => (int) $user->cartProducts()->sum('cart_items.quantity'),
             ]);
         }
 

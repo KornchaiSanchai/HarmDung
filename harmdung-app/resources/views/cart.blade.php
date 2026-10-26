@@ -60,9 +60,11 @@
                             class="item-checkbox w-5 h-5 accent-[#00fff2] cursor-pointer"
                         >
 
-                        <!-- กล่องแสดงชื่อแพลตฟอร์มที่ถูกต้อง -->
-                        <div class="w-24 aspect-video rounded-xl bg-gradient-to-r from-[#0b1b3d] to-[#043360] flex items-center justify-center text-white font-bold text-xs text-center uppercase">
-                            {{$item->platform->name ?? 'Harmdung' }}
+                        <!-- รูปภาพแบนเนอร์สินค้าจากหน้าสินค้าทั้งหมด -->
+                        <div class="{{ $item->platform?->bg_class ?? 'bg-gradient-to-r from-[#0b1b3d] to-[#043360]' }} w-24 aspect-video rounded-xl overflow-hidden flex items-center justify-center shrink-0 shadow border border-white/10">
+                            <img src="{{ $item->platform?->image_url ?? asset('images/logo.png') }}" 
+                                 alt="{{ $item->platform->name ?? 'Harmdung' }}" 
+                                 class="w-full h-full object-cover">
                         </div>
 
                         <div>
@@ -107,7 +109,7 @@
                 <div class="bg-gray-900 rounded-[24px] p-12 text-center border border-gray-800">
                     <p class="text-gray-400">ยังไม่มีสินค้าในตะกร้าของคุณ</p>
                     <a href="/products" class="inline-block mt-4 bg-[#00fff2] text-black font-bold px-6 py-2 rounded-full text-xs">
-                        เลือกซื้อสินค้าเลย
+                        เลือกซื้อสินค้า
                     </a>
                 </div>
             @endforelse
@@ -133,16 +135,14 @@
                     id="checkout-button"
                     class="bg-[#00fff2] hover:bg-cyan-300 text-black font-extrabold px-8 py-3.5 rounded-full disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                 >
-                    ไปที่หน้าชำระเงิน →
+                    ไปที่หน้าชำระเงิน
                 </button>
             </div>
         @endif
     </main>
 </div>
 
-<footer class="text-center py-6 text-gray-500 text-xs border-t border-gray-800/50 mt-12">
-    &copy; {{ date('Y') }} HD Harmdung. All rights reserved.
-</footer>
+<x-footer></x-footer>
 
 <script>
     // ส่งรายการที่เลือกไปให้ CartController คำนวณยอดเงินและจำนวนจาก Backend โดยตรง
@@ -189,7 +189,15 @@
             const newQty = oldQty + delta;
 
             errorEl.classList.add('hidden');
-            if (newQty < 1) return; // ลดต่ำกว่า 1 ให้ใช้ปุ่ม "ลบ"
+            if (newQty < 1) {
+                // หากกดเครื่องหมายลบ (-) เมื่อมีสินค้าในตะกร้า 1 ชิ้น จะเป็นการลบสินค้าออกจากตะกร้า
+                const deleteForm = item.querySelector('form');
+                if (deleteForm) {
+                    btn.disabled = true;
+                    deleteForm.submit();
+                }
+                return;
+            }
 
             btn.disabled = true;
             try {
@@ -219,6 +227,13 @@
                 item.querySelector('.item-qty').textContent = data.quantity;
                 // รับยอดรวมย่อยที่คำนวณจาก Controller โดยตรง
                 item.querySelector('.item-subtotal').textContent = data.item_subtotal_text;
+
+                if (typeof data.cart_count !== 'undefined') {
+                    const navCartBadge = document.getElementById('nav-cart-count');
+                    if (navCartBadge) {
+                        navCartBadge.textContent = data.cart_count > 0 ? `(${data.cart_count})` : '';
+                    }
+                }
 
                 // อัปเดตยอดรวมคำสั่งซื้อผ่าน Controller
                 await updateCartTotal();

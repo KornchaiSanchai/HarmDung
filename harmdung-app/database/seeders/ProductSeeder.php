@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\Platform;
+use App\Models\Product;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class ProductSeeder extends Seeder
 {
@@ -17,42 +17,28 @@ class ProductSeeder extends Seeder
             return;
         }
 
-        // [ชื่อแพ็กเกจ, จำนวนวัน, ราคา, stock] 
+        // [ชื่อแพ็กเกจ, จำนวนวัน, ราคา] 
         $plans = [
-            ['1 Day',  1,  15,  20],
-            ['7 Day',  7,  25,  20],
-            ['30 Day', 30, 75,  15],
-            ['60 Day', 60, 140, 10],
+            ['1 Day',  1,  15],
+            ['7 Day',  7,  25],
+            ['30 Day', 30, 75],
+            ['60 Day', 60, 140],
         ];
-
-        $now = now();
-        $rows = [];
 
         foreach ($platforms as $platform) {
-            foreach ($plans as [$planName, $days, $price, $stock]) {
-                $rows[] = [
-                    'platform_id'   => $platform->id,
-                    'plan_name'     => $planName,
-                    'duration_days' => $days,
-                    'price'         => $price,
-                    'stock'         => $stock,
-                    'created_at'    => $now,
-                    'updated_at'    => $now,
-                ];
+            foreach ($plans as [$planName, $days, $price]) {
+                Product::updateOrCreate(
+                    [
+                        'platform_id' => $platform->id,
+                        'plan_name'   => $planName,
+                    ],
+                    [
+                        'duration_days' => $days,
+                        'price'         => $price,
+                        'stock'         => 0, // เดี๋ยว AccountStockSeeder จะมาอัปเดตตัวเลขจริงให้
+                    ]
+                );
             }
         }
-
-        // สินค้าสต็อก 0 ไว้สาธิต "สต็อกหมด"
-        $rows[] = [
-            'platform_id'   => $platforms->first()->id,
-            'plan_name'     => '30 Day (หมดสต็อก)',
-            'duration_days' => 30,
-            'price'         => 75,
-            'stock'         => 0,
-            'created_at'    => $now,
-            'updated_at'    => $now,
-        ];
-
-        DB::table('products')->insert($rows);
     }
 }

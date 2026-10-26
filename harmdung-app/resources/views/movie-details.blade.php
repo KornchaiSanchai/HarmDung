@@ -51,7 +51,7 @@
                             <div class="flex items-center gap-2 flex-wrap">
                                 @foreach ($movie->platforms as $platform)
                                 <a href="/product-info?platform={{ $platform->id }}" class="px-3 py-1 bg-gradient-to-r from-[#0b1b3d] to-[#043360] rounded-lg text-xs font-bold text-white border border-white/20 hover:scale-105 transition flex items-center gap-1.5">
-                                    @include('partials.platform-badge', ['platform' => $platform, 'size' => 'w-4 h-4'])
+                                    @include('partials.platform-badge', ['platform' => $platform, 'size' => 'w-5 h-5'])
                                     {{ $platform->name }}
                                 </a>
                                 @endforeach
@@ -176,5 +176,7 @@
             </div>
         </div>
     </main>
+
+    <x-footer></x-footer>
 </body>
 </html>

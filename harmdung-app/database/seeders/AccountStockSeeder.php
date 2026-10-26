@@ -10,10 +10,9 @@ class AccountStockSeeder extends Seeder
 {
     public function run(): void
     {
-        // ชุดข้อมูลอีเมลจำลองแยกตามแอปและแพ็กเกจ
         $stocksData = [
             [
-                'app_name' => 'Netfux',// 
+                'app_name' => 'Netfux', 
                 'packages' => [
                     1  => ['netflix_1d_01@example.com'],
                     7  => ['netflix_7d_01@example.com', 'netflix_7d_02@example.com'],
@@ -52,12 +51,10 @@ class AccountStockSeeder extends Seeder
 
         foreach ($stocksData as $item) {
             foreach ($item['packages'] as $days => $emails) {
-                // ค้นหา Product ที่เชื่อมโยงกับแพลตฟอร์มและตรงกับจำนวนวัน
                 $products = Product::whereHas('platform', function ($query) use ($item) {
                         $query->where('name', 'like', '%' . $item['app_name'] . '%');
                     })
                     ->where('duration_days', $days)
-                    ->where('stock', '>', 0)
                     ->get();
 
                 foreach ($products as $product) {
@@ -66,10 +63,15 @@ class AccountStockSeeder extends Seeder
                             'product_id' => $product->id,
                             'email' => $email,
                         ], [
-                            'password' => 'secret1234', // รหัสผ่านจำลอง
-                            'status' => 'available',    // สถานะพร้อมขาย
+                            'password' => 'secret1234',
+                            'status' => 'available',
                         ]);
                     }
+
+                    // อัปเดตสต็อกในตาราง products ให้ตรงกับจำนวน account ที่พร้อมใช้งานจริง ๆ อัตโนมัติ
+                    $product->update([
+                        'stock' => $product->accountStocks()->where('status', 'available')->count()
+                    ]);
                 }
             }
         }

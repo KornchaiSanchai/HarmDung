@@ -43,8 +43,7 @@
                                         <button type="button" 
                                                 onclick="openAccountModal('{{ addslashes($product->platform->name) }}', '{{ addslashes($product->plan_name) }}', '{{ $order->id }}', {{ json_encode($product->order_accounts) }})"
                                                 class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-50 hover:bg-[#00fff2]/20 text-[#0891b2] hover:text-black font-extrabold text-xs transition border border-[#00fff2]/40 shadow-sm active:scale-95 group">
-                                            <svg class="w-3.5 h-3.5 text-cyan-600 group-hover:text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
-                                            <span>ดูไอดีหนัง ({{ $product->order_accounts->count() }})</span>
+                                            <span>รายละเอียด ({{ $product->order_accounts->count() }})</span>
                                         </button>
                                     </div>
                                 @endif
@@ -70,6 +69,8 @@
         </div>
     </main>
 
+    <x-footer></x-footer>
+
     <!-- Modal ดูข้อมูลไอดีหนัง (Movie Account Modal) -->
     <div id="accountModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm transition-opacity duration-200">
         <div class="bg-[#1a1a1a] text-white border border-gray-800 rounded-[28px] max-w-lg w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] flex flex-col transform transition-all duration-200 scale-95 opacity-0" id="accountModalBox">
@@ -77,9 +78,6 @@
             <!-- Header -->
             <div class="flex items-start justify-between pb-4 border-b border-gray-800">
                 <div class="flex items-center gap-3">
-                    <div class="w-11 h-11 rounded-2xl bg-[#00fff2]/10 border border-[#00fff2]/30 flex items-center justify-center text-[#00fff2] shadow-sm">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
-                    </div>
                     <div>
                         <h3 class="text-xl font-extrabold text-white" id="modalPlatformTitle">ข้อมูลไอดีหนัง</h3>
                         <p class="text-xs text-gray-400 mt-0.5" id="modalOrderSubtitle">Order #HD-00000</p>

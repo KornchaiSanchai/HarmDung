@@ -34,23 +34,36 @@
     <main class="max-w-[1240px] mx-auto px-6 mt-6">
 
         <!-- Hero -->
-        <div class="bg-gradient-to-r from-[#0b1b3d] to-[#043360] rounded-[28px] p-8 md:p-10 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 border border-white/10">
-            <div class="space-y-4 max-w-xl z-10 text-center md:text-left">
-                <div class="inline-flex items-center gap-2 bg-black/40 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold text-cyan-300 border border-white/10">
-                    <span class="w-2 h-2 rounded-full bg-[#00fff2] animate-pulse"></span>
-                    พร้อมจัดส่งอัตโนมัติ 24 ชม.
-                </div>
-                <h1 class="text-3xl md:text-5xl font-black text-white tracking-tight">{{ $platform->name }}</h1>
-            </div>
+         <div class="relative w-full h-48 md:h-64 rounded-[28px] overflow-hidden shadow-2xl border border-white/10 group">
+                    @php
+            // ตัดช่องว่างและแปลงเป็นตัวพิมพ์เล็กเพื่อความชัวร์
+            $platformSlug = strtolower(trim($platform->name));
+            
+            $imgName = match($platformSlug) {
+                'netfux' => 'netfuxproduct-info.png', //
+                'hiv min' => 'hivproduct-info.png',
+                'prime hindu video' => 'hinduproduct-info.png',
+                'thisney-' => 'thisneyproduct-info.png',
+                default => 'logo.png'
+            };
+        @endphp
 
-            @if ($platform->logo_url)
-                <div class="w-44 h-44 md:w-56 md:h-56 shrink-0 flex items-center justify-center">
-                    <div class="w-36 h-36 md:w-44 md:h-44 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl flex items-center justify-center overflow-hidden">
-                        <img src="{{ $platform->logo_url }}" alt="{{ $platform->name }}" class="w-full h-full object-cover">
+                
+        <img src="{{ url('images/' . $imgName) }}"
+            alt="{{ $platform->name }}"
+            class="w-full h-full object-cover object-center transition duration-500">
+
+                    <!-- Gradient Overlay ด้านล่างเพื่อให้ตัวหนังสืออ่านง่ายและเด่นชัด -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex items-end p-6 md:p-8">
+                        <div class="space-y-2">
+                            <div class="inline-flex items-center gap-2 bg-black/60 backdrop-blur-md px-3.5 py-1 rounded-full text-xs font-bold text-cyan-300 border border-white/10">
+                                <span class="w-2 h-2 rounded-full bg-[#00fff2] animate-pulse"></span>
+                                พร้อมจัดส่งอัตโนมัติ 24 ชม.
+                            </div>
+                            <h1 class="text-3xl md:text-4xl font-black text-white tracking-tight">{{ $platform->name }}</h1>
+                        </div>
                     </div>
                 </div>
-            @endif
-        </div>
 
         <!-- Packages -->
         <div class="mt-12">
@@ -122,6 +135,8 @@
         </div>
     </main>
 
+    <x-footer></x-footer>
+
     <!-- Popup ตะกร้าที่มุมขวาล่าง (Cart Toast Popup Container) -->
     <div id="cartToastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none max-w-sm w-full px-4 sm:px-0"></div>
 
@@ -132,6 +147,7 @@
 
             const toast = document.createElement('div');
             const isSuccess = type === 'success';
+            const isUnauth = type === 'unauth';
 
             // Base classes
             toast.className = `cart-toast pointer-events-auto rounded-2xl p-4 shadow-2xl backdrop-blur-md flex items-start gap-3.5 transform transition-all duration-300 translate-y-4 opacity-0 border ${
@@ -147,15 +163,24 @@
 
             const titleText = isSuccess ? 'เพิ่มลงตะกร้าแล้ว' : 'ไม่สามารถเพิ่มสินค้าได้';
             const titleColor = isSuccess ? 'text-emerald-400' : 'text-rose-400';
-            const actionBtn = isSuccess
-                ? `<a href="/cart" class="inline-flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-black px-3.5 py-1.5 rounded-full transition shadow-md active:scale-95">
+
+            let actionBtn = '';
+            if (isSuccess) {
+                actionBtn = `<a href="/cart" class="inline-flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-black px-3.5 py-1.5 rounded-full transition shadow-md active:scale-95">
                         ดูตะกร้าสินค้า
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
-                   </a>`
-                : `<a href="/cart" class="inline-flex items-center gap-1.5 bg-rose-500/90 hover:bg-rose-500 text-white text-xs font-bold px-3.5 py-1.5 rounded-full transition shadow-md active:scale-95">
+                    </a>`;
+            } else if (isUnauth) {
+                actionBtn = `<a href="/login" class="inline-flex items-center gap-1.5 bg-rose-500/90 hover:bg-rose-500 text-white text-xs font-bold px-3.5 py-1.5 rounded-full transition shadow-md active:scale-95">
+                        กรุณาเข้าสู่ระบบ
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+                    </a>`;
+            } else {
+                actionBtn = `<a href="/cart" class="inline-flex items-center gap-1.5 bg-rose-500/90 hover:bg-rose-500 text-white text-xs font-bold px-3.5 py-1.5 rounded-full transition shadow-md active:scale-95">
                         ตรวจสอบตะกร้า
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
-                   </a>`;
+                    </a>`;
+            }
 
             toast.innerHTML = `
                 <div class="w-10 h-10 rounded-xl ${isSuccess ? 'bg-emerald-500/20 border border-emerald-500/40' : 'bg-rose-500/20 border border-rose-500/40'} flex items-center justify-center shrink-0">
@@ -164,7 +189,6 @@
                 <div class="flex-1 min-w-0">
                     <h4 class="text-sm font-extrabold ${titleColor} flex items-center gap-1.5">
                         <span>${titleText}</span>
-                        ${isSuccess ? '<svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>' : ''}
                     </h4>
                     <p class="text-xs text-gray-200 mt-1 leading-relaxed">${message}</p>
                     <div class="mt-2.5 flex items-center gap-2">
@@ -204,9 +228,17 @@
 
         // Intercept add to cart form submissions
         document.addEventListener('DOMContentLoaded', function() {
+            const isAuthenticated = {{ auth()->check() ? 'true' : 'false' }};
+
             document.querySelectorAll('.add-to-cart-form').forEach(form => {
                 form.addEventListener('submit', async function(e) {
                     e.preventDefault();
+
+                    if (!isAuthenticated) {
+                        showCartToast('unauth', 'กรุณาเข้าสู่ระบบก่อนทำการเพิ่มสินค้าลงในตะกร้า');
+                        return;
+                    }
+
                     const submitBtn = this.querySelector('button[type="submit"]');
                     const originalHtml = submitBtn.innerHTML;
                     submitBtn.disabled = true;
@@ -226,9 +258,20 @@
                             body: formData
                         });
 
+                        if (response.status === 401) {
+                            showCartToast('unauth', 'กรุณาเข้าสู่ระบบก่อนทำการเพิ่มสินค้าลงในตะกร้า');
+                            return;
+                        }
+
                         const data = await response.json();
 
                         if (response.ok && data.success) {
+                            if (typeof data.cart_count !== 'undefined') {
+                                const navCartBadge = document.getElementById('nav-cart-count');
+                                if (navCartBadge) {
+                                    navCartBadge.textContent = data.cart_count > 0 ? `(${data.cart_count})` : '';
+                                }
+                            }
                             showCartToast('success', data.message || 'เพิ่มสินค้าลงในตะกร้าเรียบร้อยแล้ว');
                         } else {
                             showCartToast('error', data.message || 'จำนวนสินค้าในตะกร้าเกินจำนวนสินค้าที่มีในสต็อก');

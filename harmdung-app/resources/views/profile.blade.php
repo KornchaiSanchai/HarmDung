@@ -77,8 +77,7 @@
                         <div class="bg-black/40 px-5 py-2.5 rounded-2xl border border-gray-800 flex items-center gap-3">
                             <span class="text-xs text-gray-400">ยอดเงินคงเหลือ:</span>
                             <div class="flex items-center gap-2">
-                                <span class="w-5 h-5 bg-gradient-to-tr from-yellow-500 to-amber-300 rounded-full flex items-center justify-center text-black font-extrabold text-xs shadow-sm">฿</span>
-                                <span class="text-lg font-black text-[#00fff2]">{{ $formattedBalance }}</span>
+                                <span class="text-lg font-black text-[#ffffff]">{{ $formattedBalance }}</span>
                             </div>
                         </div>
                         <div class="bg-black/40 px-5 py-2.5 rounded-2xl border border-gray-800 flex items-center gap-3">
@@ -107,8 +106,10 @@
     @endphp
     <div class="bg-white text-black rounded-[24px] p-6 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div class="flex items-center gap-5">
-            <div class="w-24 aspect-video rounded-xl bg-gradient-to-r from-[#5a1bb9] to-[#204ce4] flex items-center justify-center text-white font-extrabold text-sm shadow">
-                {{ $product->platform->name }}
+            <div class="{{ $product->platform?->bg_class ?? 'bg-gradient-to-r from-[#0b1b3d] to-[#043360]' }} w-24 aspect-video rounded-xl overflow-hidden flex items-center justify-center shrink-0 shadow border border-gray-100">
+                <img src="{{ $product->platform?->image_url ?? asset('images/logo.png') }}" 
+                     alt="{{ $product->platform->name ?? 'Harmdung' }}" 
+                     class="w-full h-full object-cover">
             </div>
             <div>
                 <h4 class="text-lg font-extrabold leading-tight">{{ $product->platform->name }}</h4>
@@ -124,8 +125,7 @@
                         <button type="button" 
                                 onclick="openAccountModal('{{ addslashes($product->platform->name) }}', '{{ addslashes($product->plan_name) }}', 'HD-{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}', {{ json_encode($accounts->values()) }})"
                                 class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-cyan-50 hover:bg-[#00fff2]/20 text-[#0891b2] hover:text-black font-extrabold text-xs transition border border-[#00fff2]/40 shadow-sm active:scale-95 group">
-                            <svg class="w-3.5 h-3.5 text-cyan-600 group-hover:text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
-                            <span>ดูไอดีหนัง ({{ $accounts->count() }})</span>
+                            <span>รายละเอียด ({{ $accounts->count() }})</span>
                         </button>
                     @endif
                 </div>
@@ -230,8 +230,7 @@
                         <button type="button" 
                                 onclick="openAccountModal('{{ addslashes($product->platform->name) }}', '{{ addslashes($product->plan_name) }}', 'HD-{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}', {{ json_encode($accounts->values()) }})"
                                 class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-cyan-50 hover:bg-[#00fff2]/25 text-[#0891b2] hover:text-black font-extrabold text-xs transition border border-[#00fff2]/40 shadow-sm active:scale-95 group">
-                            <svg class="w-3.5 h-3.5 text-cyan-600 group-hover:text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
-                            <span>ดูไอดีหนัง ({{ $accounts->count() }})</span>
+                            <span>รายละเอียด ({{ $accounts->count() }})</span>
                         </button>
                         <span class="text-[11px] text-gray-500 font-mono truncate max-w-[150px]">
                             {{ $accounts->first()->email }}
@@ -303,9 +302,6 @@
             <!-- Header -->
             <div class="flex items-start justify-between pb-4 border-b border-gray-800">
                 <div class="flex items-center gap-3">
-                    <div class="w-11 h-11 rounded-2xl bg-[#00fff2]/10 border border-[#00fff2]/30 flex items-center justify-center text-[#00fff2] shadow-sm">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
-                    </div>
                     <div>
                         <h3 class="text-xl font-extrabold text-white" id="modalPlatformTitle">ข้อมูลไอดีหนัง</h3>
                         <p class="text-xs text-gray-400 mt-0.5" id="modalOrderSubtitle">Order #HD-00000</p>
@@ -320,19 +316,9 @@
             <div class="overflow-y-auto py-4 space-y-4 flex-1 pr-1" id="modalAccountsList">
                 <!-- Dynamically generated account cards -->
             </div>
-
-            <!-- Footer -->
-            <div class="pt-4 border-t border-gray-800 flex items-center justify-between gap-3">
-                <button type="button" onclick="copyAllAccounts()" id="copyAllBtn" class="px-4 py-2.5 rounded-full text-xs font-bold bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700 transition flex items-center gap-1.5 active:scale-95">
-                    <svg class="w-4 h-4 text-[#00fff2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                    <span>คัดลอกทั้งหมด</span>
-                </button>
-                <button type="button" onclick="closeAccountModal()" class="px-6 py-2.5 rounded-full text-xs font-extrabold bg-[#00fff2] hover:bg-cyan-300 text-black transition active:scale-95 shadow-md shadow-cyan-500/20">
-                    ปิดหน้าต่าง
-                </button>
-            </div>
         </div>
     </div>
+    <x-footer></x-footer>
 
     <script>
         function switchTab(tabKey) {
@@ -472,7 +458,7 @@
         function copyText(text, btn) {
             navigator.clipboard.writeText(text).then(() => {
                 const originalHtml = btn.innerHTML;
-                btn.innerHTML = `<span class="text-emerald-400 font-bold">คัดลอกแล้ว! ✓</span>`;
+                btn.innerHTML = `<span class="text-emerald-400 font-bold">คัดลอกแล้ว!</span>`;
                 setTimeout(() => {
                     btn.innerHTML = originalHtml;
                 }, 1500);

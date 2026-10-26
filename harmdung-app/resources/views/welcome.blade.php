@@ -42,6 +42,49 @@
             font-size: 2rem !important;
             font-weight: bold;
         }
+        .genre-arrow-prev, .genre-arrow-next {
+            position: absolute;
+            top: 45%;
+            transform: translateY(-50%);
+            z-index: 20;
+            width: 32px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            cursor: pointer;
+            transition: color 0.25s ease, opacity 0.25s ease, transform 0.25s ease;
+            border: none;
+            background: #000000ff;
+            padding: 0;
+        }
+        .genre-arrow-prev {
+            left: 0;
+        }
+        .genre-arrow-next {
+            right: 0;
+        }
+        .genre-arrow-prev:hover, .genre-arrow-next:hover {
+            color: #00fff2;
+            transform: translateY(-50%) scale(1.18);
+        }
+        .genre-arrow-prev::after {
+            content: 'prev';
+            font-family: swiper-icons;
+            font-size: 1.35rem;
+            font-weight: bold;
+        }
+        .genre-arrow-next::after {
+            content: 'next';
+            font-family: swiper-icons;
+            font-size: 1.35rem;
+            font-weight: bold;
+        }
+        .genre-arrow-prev:disabled, .genre-arrow-next:disabled {
+            opacity: 0 !important;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body class="bg-[#171717] text-white font-sans antialiased min-h-screen pb-16 selection:bg-[#00fff2] selection:text-black">
@@ -109,7 +152,7 @@
                             <div class="flex items-center gap-1.5 text-xs font-semibold text-gray-400 flex-wrap">
                                 <span class="text-[11px]">รับชมได้ที่</span>
                                 @foreach ($movie->platforms as $platform)
-                                    @include('partials.platform-badge', ['platform' => $platform, 'size' => 'w-4 h-4'])
+                                    @include('partials.platform-badge', ['platform' => $platform, 'size' => 'w-5 h-5'])
                                 @endforeach
                             </div>
                         @endif
@@ -210,20 +253,13 @@
                     <span class="w-2 h-5 bg-[#00fff2] rounded-full inline-block"></span>
                     <span>{{ $genre->label }}</span>
                 </h3>
-
-                <!-- Arrow Controls มุมขวาบน -->
-                <div class="flex items-center gap-2">
-                    <button type="button" class="genre-arrow-prev w-9 h-9 rounded-full bg-gray-800/90 hover:bg-[#00fff2] hover:text-black text-white flex items-center justify-center transition border border-gray-700 cursor-pointer shadow-md active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed" title="ดูหนังก่อนหน้า">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
-                    </button>
-                    <button type="button" class="genre-arrow-next w-9 h-9 rounded-full bg-gray-800/90 hover:bg-[#00fff2] hover:text-black text-white flex items-center justify-center transition border border-gray-700 cursor-pointer shadow-md active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed" title="ดูหนังถัดไปในหมวดนี้">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
-                    </button>
-                </div>
             </div>
 
             <!-- แถบเลื่อนแสดงหนัง -->
-            <div class="relative">
+            <div class="relative group/genre-slider">
+                <!-- ปุ่มเลื่อนซ้าย สไตล์เดียวกับ Top 5 ครอบซ้ายสุดของหนังเรื่องแรก -->
+                <button type="button" class="genre-arrow-prev" title="ดูหนังก่อนหน้า"></button>
+
                 <!-- Track หนังเลื่อนแนวนอน -->
                 <div class="genre-slider flex gap-5 overflow-x-auto scroll-smooth py-3 px-1 scrollbar-none" style="scrollbar-width: none; -ms-overflow-style: none;">
                     @foreach ($genre->movies as $movie)
@@ -246,7 +282,7 @@
                                 <div class="flex items-center gap-1.5 text-xs font-semibold text-gray-400 flex-wrap mt-auto">
                                     <span class="text-[11px]">รับชมได้ที่</span>
                                     @foreach ($movie->platforms as $platform)
-                                        @include('partials.platform-badge', ['platform' => $platform, 'size' => 'w-4 h-4'])
+                                        @include('partials.platform-badge', ['platform' => $platform, 'size' => 'w-5 h-5'])
                                     @endforeach
                                 </div>
                             @endif
@@ -254,12 +290,16 @@
                     </div>
                     @endforeach
                 </div>
+
+                <!-- ปุ่มเลื่อนขวา สไตล์เดียวกับ Top 5 ครอบขวาสุดของหนังเรื่องสุดท้าย -->
+                <button type="button" class="genre-arrow-next" title="ดูหนังถัดไปในหมวดนี้"></button>
             </div>
         </div>
         @empty
         <p class="text-gray-400">ยังไม่มีข้อมูลหมวดหมู่</p>
         @endforelse
     </div>
+    <x-footer></x-footer>
 
     <!-- นำเข้า Swiper JS -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
@@ -295,12 +335,12 @@
                     const canNext = slider.scrollLeft < (slider.scrollWidth - slider.clientWidth - 15);
                     prevBtns.forEach(btn => {
                         btn.disabled = !canPrev;
-                        btn.classList.toggle('opacity-30', !canPrev);
+                        btn.classList.toggle('opacity-0', !canPrev);
                         btn.classList.toggle('pointer-events-none', !canPrev);
                     });
                     nextBtns.forEach(btn => {
                         btn.disabled = !canNext;
-                        btn.classList.toggle('opacity-30', !canNext);
+                        btn.classList.toggle('opacity-0', !canNext);
                         btn.classList.toggle('pointer-events-none', !canNext);
                     });
                 };

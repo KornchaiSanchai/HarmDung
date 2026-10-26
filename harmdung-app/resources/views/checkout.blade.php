@@ -38,11 +38,20 @@
                 @forelse($cartItems as $item)
                     <div class="grid grid-cols-12 items-center py-4 gap-4">
                         <div class="col-span-6 flex items-center gap-4">
-                            <div class="w-20 aspect-video rounded-xl overflow-hidden shadow bg-gradient-to-r from-[#0b1b3d] to-[#043360] flex items-center justify-center text-white font-bold text-xs shrink-0">
-                                {{ $item->platform->name ?? 'Harmdung' }}
+                            <div class="w-20 aspect-video rounded-xl overflow-hidden shadow border border-white/10 shrink-0 bg-black/40 flex items-center justify-center">
+                                @if(!empty($item->platform?->image_url))
+                                    <img src="{{ $item->platform->image_url }}" alt="{{ $item->platform->name ?? 'Harmdung' }}" class="w-full h-full object-cover">
+                                @else
+                                    <div class="w-full h-full bg-gradient-to-r from-[#0b1b3d] to-[#043360] flex items-center justify-center text-white font-bold text-xs">
+                                        {{ $item->platform->name ?? 'Harmdung' }}
+                                    </div>
+                                @endif
                             </div>
                             <div>
                                 <h3 class="font-bold text-base text-white">{{ $item->plan_name }}</h3>
+                                @if(!empty($item->platform?->name))
+                                    <p class="text-xs text-gray-400 mt-0.5">{{ $item->platform->name }}</p>
+                                @endif
                             </div>
                         </div>
                         <div class="col-span-2 text-center text-gray-300 text-sm">{{ number_format($item->price, 2) }} บาท</div>
@@ -87,8 +96,8 @@
                                 </span>
                             </div>
                         </div>
-                        <button type="button" id="removeCouponBtn" class="text-xs text-rose-400 hover:text-rose-300 font-bold underline cursor-pointer ml-3 shrink-0">
-                            ✕ ยกเลิกคูปอง
+                        <button type="button" id="removeCouponBtn" class="text-xs text-rose-400 hover:text-rose-300 font-bold cursor-pointer ml-3 shrink-0">
+                            ✕ 
                         </button>
                     </div>
                 @endif
@@ -106,12 +115,12 @@
                     @endforeach
                     <input type="hidden" name="coupon_code" id="hiddenCouponCode" value="{{ $couponCode ?? '' }}">
 
-                    <!-- 1. แบบเลือกจาก Dropdown -->
+                    <!-- เลือกจาก Dropdown คูปองที่มี -->
                     <div>
                         <label for="couponSelect" class="block text-xs text-gray-400 mb-1.5 font-medium">
-                            เลือกคูปองส่วนลดที่มี (สามารถเปลี่ยนได้ตลอดเวลา):
+                            เลือกคูปองส่วนลดที่มี (สามารถเปลี่ยนหรือยกเลิกได้):
                         </label>
-                        <select id="couponSelect" class="w-full bg-[#171717] border border-gray-700 text-white text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-[#00fff2] cursor-pointer">
+                        <select id="couponSelect" class="w-full bg-[#171717] border border-gray-700 text-white text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-[#00fff2] cursor-pointer transition">
                             <option value="" class="bg-[#171717] text-gray-400">-- ไม่ใช้คูปองส่วนลด / ยกเลิกคูปอง --</option>
                             @isset($availableCoupons)
                                 @foreach($availableCoupons as $c)
@@ -128,19 +137,6 @@
                                 @endforeach
                             @endisset
                         </select>
-                    </div>
-
-                    <div class="text-xs text-center text-gray-500 font-semibold">- หรือพิมพ์โค้ดส่วนลด -</div>
-
-                    <!-- 2. แบบพิมพ์โค้ดเอง -->
-                    <div>
-                        <div class="flex gap-2">
-                            <input type="text" id="customCouponInput" value="{{ $couponCode ?? '' }}" placeholder="กรอกโค้ดส่วนลด เช่น SAVE5..." 
-                                   class="w-full bg-[#171717] border border-gray-700 text-white text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-[#00fff2] uppercase tracking-wider">
-                            <button type="button" id="applyCustomCouponBtn" class="bg-[#00fff2] hover:bg-cyan-300 text-black font-bold text-sm px-6 py-2.5 rounded-xl transition shrink-0 cursor-pointer shadow-md">
-                                ใช้โค้ด
-                            </button>
-                        </div>
                     </div>
                 </form>
             </div>
@@ -171,11 +167,12 @@
                 </div>
 
                 <div class="flex items-center gap-3 w-full sm:w-auto">
-                    <a href="{{ route('cart.index') }}" class="w-full sm:w-auto text-center bg-gray-800 hover:bg-gray-700 text-white font-bold px-6 py-3 rounded-xl transition">ย้อนกลับ</a>
-                    <button type="submit" class="w-full sm:w-auto bg-[#00fff2] hover:bg-cyan-300 text-black font-extrabold px-8 py-3 rounded-xl transition shadow-lg shadow-cyan-500/25 cursor-pointer">
+                    <a href="{{ route('cart.index') }}" class="w-full sm:w-auto bg-gray-200 text-black font-bold px-6 py-3.5 rounded-full transition shadow-md shadow-gray-500/20 text-base flex items-center justify-center gap-2 cursor-pointer active:scale-95">ย้อนกลับ</a>
+                    <button type="submit" class="bg-[#00fff2] hover:bg-cyan-300 text-black font-extrabold px-8 py-3.5 rounded-full disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer">
                         สั่งซื้อสินค้า
                     </button>
                 </div>
+                
             </form>
         </main>
     </div>
@@ -186,47 +183,34 @@
             const couponForm = document.getElementById('couponForm');
             const hiddenCouponCode = document.getElementById('hiddenCouponCode');
             const couponSelect = document.getElementById('couponSelect');
-            const customCouponInput = document.getElementById('customCouponInput');
-            const applyCustomCouponBtn = document.getElementById('applyCustomCouponBtn');
             const removeCouponBtn = document.getElementById('removeCouponBtn');
 
             // 1) เมื่อเลือกจาก Dropdown -> เปลี่ยนคูปองทันที (หรือถ้าเลือกค่าว่างจะเป็นการยกเลิกคูปอง)
             if (couponSelect) {
                 couponSelect.addEventListener('change', function () {
-                    hiddenCouponCode.value = this.value;
-                    couponForm.submit();
-                });
-            }
-
-            // 2) เมื่อพิมพ์โค้ดเองแล้วกดปุ่ม "ใช้โค้ด"
-            if (applyCustomCouponBtn && customCouponInput) {
-                applyCustomCouponBtn.addEventListener('click', function () {
-                    hiddenCouponCode.value = (customCouponInput.value || '').trim();
-                    couponForm.submit();
-                });
-
-                customCouponInput.addEventListener('keydown', function (e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        hiddenCouponCode.value = (this.value || '').trim();
+                    if (hiddenCouponCode) {
+                        hiddenCouponCode.value = this.value;
+                    }
+                    if (couponForm) {
                         couponForm.submit();
                     }
                 });
             }
 
-            // 3) เมื่อกดยกเลิกคูปอง
+            // 2) เมื่อกดยกเลิกคูปอง
             if (removeCouponBtn) {
                 removeCouponBtn.addEventListener('click', function () {
-                    hiddenCouponCode.value = '';
-                    couponForm.submit();
+                    if (hiddenCouponCode) {
+                        hiddenCouponCode.value = '';
+                    }
+                    if (couponForm) {
+                        couponForm.submit();
+                    }
                 });
             }
         });
     </script>
 
-    <!-- Footer -->
-    <footer class="text-center py-6 text-gray-500 text-xs border-t border-gray-800/50 mt-12">
-        &copy; {{ date('Y') }} HD Harmdung. All rights reserved.
-    </footer>
+    <x-footer></x-footer>
 </body>
 </html>

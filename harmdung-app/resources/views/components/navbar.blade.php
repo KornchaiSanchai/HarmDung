@@ -23,9 +23,12 @@
                     สินค้าทั้งหมด
                 </a>
                 @auth
+                @php
+                    $cartCount = (int) auth()->user()->cartProducts()->sum('cart_items.quantity');
+                @endphp
                 <a href="/cart" class="{{ $base }} {{ $active === 'cart' ? $on : $off }}">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                    ตะกร้า
+                    ตะกร้า<span id="nav-cart-count">{{ $cartCount > 0 ? "({$cartCount})" : '' }}</span>
                 </a>
                 @endauth
             </div>
@@ -37,7 +40,7 @@
         <div class="flex items-center gap-4 text-sm font-semibold">
             @auth
                 <div class="bg-gray-800/90 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 border border-gray-700/80 shadow">
-                    <span class="w-5 h-5 bg-gradient-to-tr from-yellow-500 to-amber-300 rounded-full flex items-center justify-center text-black font-extrabold text-xs shadow-sm">฿</span>
+                    <span class="w-5 h-5 border-2 border-white rounded-full flex items-center justify-center text-white font-extrabold text-sm shadow-sm">฿</span>
                     <span class="font-bold text-gray-100">{{ auth()->user()->formatted_balance }}</span>
                 </div>
                 <a href="/profile" class="w-10 h-10 bg-[#00fff2] rounded-full flex items-center justify-center text-black font-bold shadow-md ring-2 ring-[#00fff2]/50 hover:scale-105 transition" title="ข้อมูลสมาชิก">
