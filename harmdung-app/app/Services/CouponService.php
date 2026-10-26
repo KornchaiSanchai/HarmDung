@@ -308,6 +308,8 @@ class CouponService
         return rtrim(rtrim(number_format((float) $coupon->discount_percent, 2, '.', ''), '0'), '.');
     }
 
+    /** ลดได้เฉพาะสินค้าที่ผูกกับคูปองใน coupon_product */
+      /** ลดได้เฉพาะสินค้าที่ผูกกับคูปองใน coupon_product */
     private function eligibleItems(Coupon $coupon, Collection $items): Collection
     {
         // เคส demo 'NOPRODUCT5': คูปองที่ไม่มีสินค้าร่วมรายการ
@@ -328,11 +330,21 @@ class CouponService
     public function sum(Collection $items): float
     {
         return round($items->sum(
-            fn ($item) => (float) data_get($item, 'price', 0) * (int) data_get($item, 'quantity', 1)
+            fn ($item) => (float) data_get($item, 'price', 0) * $this->quantityOf($item)
         ), 2);
     }
 
-    public function normalize(?string $code): string
+    private function productIdOf($item): int
+    {
+        return (int) (data_get($item, 'product_id') ?? data_get($item, 'id'));
+    }
+
+    private function quantityOf($item): int
+    {
+        return (int) (data_get($item, 'quantity') ?? data_get($item, 'pivot.quantity', 1));
+    }
+
+    private function normalize(?string $code): string
     {
         return strtoupper(trim((string) $code));
     }

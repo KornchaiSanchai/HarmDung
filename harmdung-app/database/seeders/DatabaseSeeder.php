@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             GenreSeeder::class,      // มะปิน
             MovieSeeder::class,      // มะปิน (รวม movie_platform, movie_genre)
             ProductSeeder::class,    // อิ้ง
+            AccountStockSeeder::class, // อิ้ง
             CouponSeeder::class,     // กร (รวม coupon_product)
             ReviewSeeder::class,     // กร (optional)
         ];

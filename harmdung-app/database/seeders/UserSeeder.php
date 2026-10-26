@@ -11,14 +11,17 @@ class UserSeeder extends Seeder
     {
         $users = [
             ['email' => 'member@example.com', 'name' => 'Test Member'],
-            ['email' => 'admin@example.com',  'name' => 'Admin'],
+            ['email' => 'admin@example.com',  'name' => 'Admin', 'balance' => 99999999],
             ['email' => 'somchai@example.com', 'name' => 'Somchai'],
         ];
 
         foreach ($users as $u) {
             User::firstOrCreate(
                 ['email' => $u['email']],
-                ['name' => $u['name'], 'password' => 'password'],
+                array_merge(
+                    ['name' => $u['name'], 'password' => 'password'],
+                    isset($u['balance']) ? ['balance' => $u['balance']] : []
+                ),
             );
         }
     }

@@ -28,13 +28,26 @@ class MovieSeeder extends Seeder
     private const PAGES_PER_PLATFORM = 2;  // 20 results per page
     private const BATCH = 10;              // concurrent detail requests
 
+    /**
+     * ชื่อแพลตฟอร์มในเว็บ (ชื่อล้อเลียนจาก PlatformSeeder) => ชื่อ provider จริงบน TMDB (region TH)
+     * ชื่อที่ไม่อยู่ใน map จะใช้ชื่อเดิมไปจับคู่ตรงๆ
+     */
+    private const TMDB_PROVIDER_NAMES = [
+        'Netfux' => 'Netflix',
+        'Hiv min' => 'HBO Max',
+        'Prime hindu video' => 'Amazon Prime Video',
+        'Thisney-' => 'Disney+',
+    ];
+
     public function run(): void
     {
         if (! $this->tmdbReady()) {
             return;
         }
 
-        $platforms = Platform::pluck('id', 'name'); // name => local id
+        // TMDB provider name => local id
+        $platforms = Platform::pluck('id', 'name')
+            ->mapWithKeys(fn ($id, $name) => [self::TMDB_PROVIDER_NAMES[$name] ?? $name => $id]);
         if ($platforms->isEmpty()) {
             $this->command?->warn('No platforms found, run PlatformSeeder first.');
 
