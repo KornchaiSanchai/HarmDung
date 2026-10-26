@@ -11,44 +11,7 @@
 </head>
 <body class="bg-[#171717] text-white font-sans antialiased min-h-screen pb-16 selection:bg-[#00fff2] selection:text-black">
 
-    <!-- Navbar -->
-    <header>
-        <nav class="flex items-center justify-between px-8 py-4 border-b border-gray-800/80 bg-[#121212]/80 backdrop-blur-md sticky top-0 z-50">
-            <div class="flex items-center gap-8">
-                <!-- Logo -->
-                <a href="/home" class="flex items-center shrink-0 group">
-                    <img src="/images/logo.png" alt="HD Harmdung" class="h-10 w-auto object-contain scale-125 origin-left transition-transform group-hover:scale-130">
-                </a>
-                
-                <!-- Nav Links -->
-                <div class="flex items-center gap-2">
-                    <a href="/home" class="flex items-center gap-2 px-5 py-2 text-sm text-gray-300 hover:text-white transition rounded-full hover:bg-gray-800/50">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                        หน้าแรก
-                    </a>
-                    <a href="/products" class="flex items-center gap-2 px-5 py-2 text-sm text-gray-300 hover:text-white transition rounded-full hover:bg-gray-800/50">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                        สินค้าทั้งหมด
-                    </a>
-                    <a href="/cart" class="flex items-center gap-2 px-5 py-2 rounded-full text-sm text-gray-300 hover:text-white transition hover:bg-gray-800/50">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                        ตะกร้า
-                    </a>
-                </div>
-            </div>
-
-            <!-- Profile & Balance -->
-            <div class="flex items-center gap-4">
-                <div class="bg-gray-800/90 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 border border-gray-700/80 shadow">
-                    <span class="w-5 h-5 bg-gradient-to-tr from-yellow-500 to-amber-300 rounded-full flex items-center justify-center text-black font-extrabold text-xs shadow-sm">฿</span>
-                    <span class="font-bold text-gray-100">100.00</span>
-                </div>
-                <div class="w-10 h-10 bg-[#00fff2] rounded-full flex items-center justify-center text-black font-bold shadow-md ring-2 ring-[#00fff2]/50">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                </div>
-            </div>
-        </nav>
-    </header>
+    <x-navbar active="member"></x-navbar>
 
     <!-- Main Member Container -->
     <main class="max-w-[1300px] mx-auto px-6 mt-10">
@@ -58,9 +21,6 @@
             <div>
                 <h1 class="text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
                     โปรไฟล์ของคุณ
-                    <span class="text-xs font-semibold px-3 py-1 bg-cyan-950 text-[#00fff2] border border-[#00fff2]/30 rounded-full">
-                        สมาชิกทั่วไป
-                    </span>
                 </h1>
                 <p class="text-gray-400 text-sm mt-1">จัดการข้อมูลส่วนตัว การตั้งค่า และดูประวัติการทำรายการของคุณ</p>
             </div>
@@ -99,9 +59,9 @@
         <!-- =================== TAB 1: ข้อมูลผู้ใช้ (Profile) =================== -->
         <div id="tab-content-profile" class="tab-pane mt-8">
             <!-- User Overview Card -->
-            <div class="bg-gradient-to-r from-gray-900 to-[#1f2937] rounded-[28px] p-8 border border-gray-800 shadow-xl flex flex-col md:flex-row items-center gap-8">
+            <div class="flex flex-col md:flex-row items-center gap-8">
                 <!-- Avatar circle matching Figma Group 11 (#24:468) -->
-                <div class="relative w-32 h-32 rounded-full bg-gradient-to-tr from-[#00fff2] to-cyan-500 p-1 shadow-2xl flex items-center justify-center shrink-0">
+                <div class="flex items-center justify-center shrink-0">
                     <div class="w-full h-full bg-[#171717] rounded-full flex items-center justify-center overflow-hidden">
                         <img src="/images/avatar.png" alt="User Avatar" class="w-24 h-24 object-contain filter invert opacity-90">
                     </div>
@@ -110,22 +70,8 @@
                 <div class="space-y-3 text-center md:text-left flex-1">
                     <div class="flex flex-col md:flex-row md:items-center gap-3">
                         <h2 class="text-2xl md:text-3xl font-extrabold text-white">HarmDung User</h2>
-                        <span class="inline-flex items-center px-3 py-1 bg-emerald-500/20 text-emerald-400 text-xs font-bold rounded-full w-fit mx-auto md:mx-0 border border-emerald-500/30">
-                            ● ใช้งานอยู่
-                        </span>
                     </div>
                     <p class="text-gray-300 font-medium">xxxxxxxxx@gmail.com</p>
-                    
-                    <div class="pt-2 flex flex-wrap items-center justify-center md:justify-start gap-4">
-                        <div class="bg-black/40 px-5 py-2.5 rounded-2xl border border-gray-800 flex items-center gap-3">
-                            <span class="text-xs text-gray-400">ยอดเงินคงเหลือ:</span>
-                            <span class="text-lg font-black text-[#00fff2]">฿ 100.00</span>
-                        </div>
-                        <div class="bg-black/40 px-5 py-2.5 rounded-2xl border border-gray-800 flex items-center gap-3">
-                            <span class="text-xs text-gray-400">คำสั่งซื้อทั้งหมด:</span>
-                            <span class="text-lg font-black text-white">3 รายการ</span>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -157,9 +103,6 @@
                                 <div class="text-xs text-gray-400">ราคา</div>
                                 <div class="text-xl font-black text-gray-900">70 บาท</div>
                             </div>
-                            <button onclick="alert('ข้อมูลบัญชี: user_hiv01 / pass: ******* (ส่งไปยังอีเมลแล้ว)')" class="bg-gray-900 hover:bg-black text-white text-xs font-bold px-5 py-2.5 rounded-xl transition">
-                                ดูข้อมูลบัญชี
-                            </button>
                         </div>
                     </div>
 
@@ -183,9 +126,6 @@
                                 <div class="text-xs text-gray-400">ราคา</div>
                                 <div class="text-xl font-black text-gray-900">50 บาท</div>
                             </div>
-                            <button onclick="alert('ข้อมูลบัญชี: user_disney99 / pass: ******* (ส่งไปยังอีเมลแล้ว)')" class="bg-gray-900 hover:bg-black text-white text-xs font-bold px-5 py-2.5 rounded-xl transition">
-                                ดูข้อมูลบัญชี
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -197,7 +137,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 
                 <!-- Box 1: Profile Information -->
-                <div class="bg-gray-900 rounded-[28px] p-8 border border-gray-800 shadow-xl space-y-6">
+                <div class="rounded-[28px] p-8 border border-gray-800 shadow-xl space-y-6">
                     <div>
                         <h3 class="text-xl font-bold text-white">ข้อมูลส่วนตัว</h3>
                         <p class="text-xs text-gray-400 mt-1">Profile Information</p>
@@ -212,7 +152,6 @@
                         <div>
                             <div class="flex items-center justify-between mb-2">
                                 <label class="block text-xs font-bold text-gray-300">อีเมล / Email</label>
-                                <span class="text-[10px] text-amber-400 font-semibold bg-amber-400/10 px-2 py-0.5 rounded-md">เปลี่ยนไม่ได้</span>
                             </div>
                             <input type="email" value="xxxxxxxxx@gmail.com" disabled class="w-full bg-gray-800/50 border border-gray-700/50 rounded-xl px-4 py-3 text-sm text-gray-400 cursor-not-allowed">
                         </div>
@@ -220,7 +159,7 @@
                 </div>
 
                 <!-- Box 2: Change Password matching Figma #29:41 -->
-                <div class="bg-gray-900 rounded-[28px] p-8 border border-gray-800 shadow-xl space-y-6">
+                <div class="rounded-[28px] p-8 border border-gray-800 shadow-xl space-y-6">
                     <div>
                         <h3 class="text-xl font-bold text-white">เปลี่ยนรหัสผ่าน</h3>
                         <p class="text-xs text-gray-400 mt-1">Change Password</p>

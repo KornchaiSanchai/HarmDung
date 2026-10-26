@@ -1,13 +1,16 @@
 <?php
 
 use App\Http\Controllers\CouponController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MemberController;
+use App\Http\Controllers\MovieController;
+use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
 
-// หน้าแรก: ผู้ใช้ที่ออกจากระบบจะถูกส่งมาที่ "/" แล้ว redirect ต่อไป /home
 Route::redirect('/', '/home');
-Route::view('/home', 'welcome')->name('home');
+Route::get('/home', [HomeController::class, 'index'])->name('home');
 
+// guest เข้าได้ เทสด้วยหน้าต่างไม่ระบุตัวตน (incognito)
 Route::view('/products', 'products')->name('products');
 Route::view('/product-info', 'product-info')->name('product-info');
 
@@ -22,13 +25,20 @@ Route::get('/coupon/options', [CouponController::class, 'options'])->name('coupo
 Route::view('/payment-success', 'payment-success')->name('payment-success');
 
 Route::view('/member', 'member')->name('member');
-Route::view('/movie-details', 'movie-details')->name('movie-details');
+Route::get('/movie-details', [MovieController::class, 'show'])->name('movie-details');
 
-// หน้าโปรไฟล์ (Member Info page - 1)
-Route::get('/profile', [MemberController::class, 'info'])->name('profile');
+// ต้องล็อกอิน: guest โดนเด้งไป /login แล้วกลับมาหน้าเดิมหลังล็อกอิน
+Route::middleware('auth')->group(function () {
+    Route::view('/product-info', 'product-info')->name('product-info');
+    Route::view('/cart', 'cart')->name('cart');
+    Route::view('/checkout', 'checkout')->name('checkout');
+    Route::view('/payment-success', 'payment-success')->name('payment-success');
+    Route::redirect('/member', '/profile')->name('member');
+    Route::get('/profile', [MemberController::class, 'info'])->name('profile');
+    Route::post('/movies/{movie}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::view('dashboard', 'dashboard')->name('dashboard');
+    Route::patch('/profile', [MemberController::class, 'updateProfile'])->name('member.profile.update');
+    Route::put('/profile/password', [MemberController::class, 'updatePassword'])->name('member.password.update');
 });
 
 require __DIR__.'/settings.php';

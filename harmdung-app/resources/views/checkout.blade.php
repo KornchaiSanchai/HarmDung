@@ -13,40 +13,7 @@
 <body class="bg-[#121212] text-white font-sans antialiased min-h-screen pb-12 flex flex-col justify-between">
 
     <div>
-       <nav class="flex items-center justify-between px-8 py-4 border-b border-gray-800">
-            <div class="flex items-center gap-8">
-                <!-- โลโก้ -->
-                <a href="/" class="flex items-center shrink-0">
-                    <img src="/images/logo.png" alt="HD Harmdung" class="h-10 w-auto object-contain scale-150 origin-left">
-                </a>
-                <!-- เมนู -->
-                <div class="flex items-center gap-2">
-                    <a href="/home" class="flex items-center gap-2 px-5 py-2 text-sm text-gray-300 hover:text-white transition">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                        หน้าแรก
-                    </a>
-                    <a href="/products" class="flex items-center gap-2 px-5 py-2 text-sm text-gray-300 hover:text-white transition">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                        สินค้าทั้งหมด
-                    </a>
-                    <a href="/cart" class="flex items-center gap-2 bg-gray-700/80 px-5 py-2 rounded-full text-sm text-white">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                        ตะกร้า
-                    </a>
-                </div>
-            </div>
-
-            <!-- ยอดเงิน / โปรไฟล์ -->
-            <div class="flex items-center gap-4">
-                <div class="bg-gray-800 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 border border-gray-700">
-                    <span class="w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center text-black font-bold text-xs">฿</span>
-                    100.00
-                </div>
-                <a href="/member" class="w-10 h-10 bg-[#00fff2] rounded-full flex items-center justify-center text-black font-bold shadow-md hover:scale-105 transition" title="ข้อมูลสมาชิก">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                </a>
-            </div>
-        </nav>
+       <x-navbar active="checkout"></x-navbar>
 
         <!-- Checkout Main Content -->
         <main class="max-w-[1100px] mx-auto px-6 mt-10">
@@ -62,40 +29,9 @@
                     <div class="col-span-2 text-right">รายการย่อย</div>
                 </div>
 
-                <!-- รายการสินค้า 1 -->
-                <div class="grid grid-cols-12 items-center py-6 border-b border-gray-100 gap-4 checkout-row" data-price="25">
-                    <div class="col-span-6 flex items-center gap-5">
-                        <div class="w-36 sm:w-44 aspect-video rounded-2xl overflow-hidden shadow-md bg-gradient-to-r from-[#0b1b3d] to-[#043360] flex items-center justify-center text-white font-extrabold text-base sm:text-lg tracking-wide shrink-0 border border-slate-700/30">
-                            Thisney-
-                        </div>
-                        <div>
-                            <h3 class="font-extrabold text-xl sm:text-2xl text-gray-900 leading-tight">Thisney-</h3>
-                            <p class="text-gray-500 text-sm sm:text-base mt-1.5 font-medium">ตัวเลือกสินค้า <span class="text-gray-700 font-semibold bg-gray-100 px-2.5 py-0.5 rounded-lg"># 7 วัน</span></p>
-                        </div>
-                    </div>
-                    <div class="col-span-2 text-center font-semibold text-base sm:text-lg text-gray-800">25 บาท</div>
-                    <div class="col-span-2 text-center">
-                        <span class="font-bold text-base sm:text-lg text-gray-900 item-qty bg-gray-100 px-3 py-1 rounded-xl">2</span>
-                    </div>
-                    <div class="col-span-2 text-right font-extrabold text-lg sm:text-xl text-gray-900 item-subtotal">50 บาท</div>
-                </div>
-
-                <!-- รายการสินค้า 2 -->
-                <div class="grid grid-cols-12 items-center py-6 border-b border-gray-200 gap-4 checkout-row" data-price="70">
-                    <div class="col-span-6 flex items-center gap-5">
-                        <div class="w-36 sm:w-44 aspect-video rounded-2xl overflow-hidden shadow-md bg-gradient-to-r from-[#5a1bb9] to-[#204ce4] flex items-center justify-center text-white font-extrabold text-base sm:text-lg tracking-wide shrink-0 border border-purple-700/30">
-                            HIV min
-                        </div>
-                        <div>
-                            <h3 class="font-extrabold text-xl sm:text-2xl text-gray-900 leading-tight">HIV min</h3>
-                            <p class="text-gray-500 text-sm sm:text-base mt-1.5 font-medium">ตัวเลือกสินค้า <span class="text-gray-700 font-semibold bg-gray-100 px-2.5 py-0.5 rounded-lg"># 30 วัน</span></p>
-                        </div>
-                    </div>
-                    <div class="col-span-2 text-center font-semibold text-base sm:text-lg text-gray-800">70 บาท</div>
-                    <div class="col-span-2 text-center">
-                        <span class="font-bold text-base sm:text-lg text-gray-900 item-qty bg-gray-100 px-3 py-1 rounded-xl">1</span>
-                    </div>
-                    <div class="col-span-2 text-right font-extrabold text-lg sm:text-xl text-gray-900 item-subtotal">70 บาท</div>
+                <!-- รายการสินค้าที่สั่งซื้อ (จะโหลดจากสินค้าที่เลือกในตะกร้า) -->
+                <div id="checkout-items-list">
+                    <!-- รายการสินค้าจะถูกเรนเดอร์จากสินค้าที่ผู้ใช้เลือกในตะกร้าจริงผ่าน JavaScript -->
                 </div>
 
                 <!-- ส่วนเลือกคูปองส่วนลด -->
@@ -221,19 +157,86 @@
     </div>
 
     <script>
-        // รายการคูปองและผลสรุปราคาที่ประเมินจาก CouponController & CouponService ฝั่ง Backend
-        const COUPONS = @json($coupons ?? []);
-        const INITIAL_SUMMARY = @json($summary ?? null);
+        const PLATFORM_IMAGES = {
+            'Thisney-': '/images/thisney.png',
+            'HIV min': '/images/hiv.png',
+            'NETFLUX': '/images/netflux.png',
+            'Prime Hindu Video': '/images/hindu.png',
+        };
 
-        let activeCoupon = (INITIAL_SUMMARY && INITIAL_SUMMARY.coupon) ? {
-            code: INITIAL_SUMMARY.code,
-            name: INITIAL_SUMMARY.name,
-            desc: INITIAL_SUMMARY.desc,
-            discount: INITIAL_SUMMARY.discount
-        } : null;
+        function platformBanner(name) {
+            const img = PLATFORM_IMAGES[name];
+            return img
+                ? `<img src="${img}" alt="${name}" class="w-full h-full object-cover">`
+                : name; // ไม่มีรูป: แสดงชื่อเป็นข้อความเหมือนเดิม
+        }
 
-        // เริ่มต้นโหลดหน้า
+        // เมื่อโหลดหน้า: โหลดสินค้าจริงจากที่เลือกในตะกร้า แล้วคำนวณราคาทันที
         window.onload = function() {
+            loadCheckoutItems();
+            calculateGrandTotal();
+        };
+
+        function loadCheckoutItems() {
+            const raw = localStorage.getItem('harmdung_checkout_items');
+            let items = [];
+            if (raw) {
+                try {
+                    items = JSON.parse(raw);
+                    if (!Array.isArray(items)) items = [];
+                } catch (e) {
+                    items = [];
+                }
+            }
+
+            const container = document.getElementById('checkout-items-list');
+            container.innerHTML = '';
+
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div class="py-12 text-center text-gray-500">
+                        <p class="text-base font-semibold">ไม่มีรายการสินค้าที่เลือกชำระเงิน</p>
+                        <a href="/cart" class="inline-block mt-3 text-sm font-bold text-cyan-600 hover:underline">← กลับไปที่ตะกร้าสินค้า</a>
+                    </div>
+                `;
+                return;
+            }
+
+            // จัดกลุ่มตามชื่อแพลตฟอร์ม (คงลำดับเดิม)
+            const groups = new Map();
+            items.forEach(item => {
+                if (!groups.has(item.name)) groups.set(item.name, []);
+                groups.get(item.name).push(item);
+            });
+
+            groups.forEach((groupItems, name) => {
+                const gradient = groupItems[0].gradient || 'from-[#0b1b3d] to-[#043360]';
+
+                const rowsHtml = groupItems.map(item => `
+                    <div class="checkout-row grid grid-cols-12 items-center py-3 gap-4" data-price="${item.price}">
+                        <div class="col-span-6 pl-32">
+                            <p class="text-gray-400 text-xs">ตัวเลือกสินค้า <span class="text-gray-700 font-medium">${item.option}</span></p>
+                        </div>
+                        <div class="col-span-2 text-center font-medium">${item.price} บาท</div>
+                        <div class="col-span-2 text-center font-medium item-qty">${item.qty}</div>
+                        <div class="col-span-2 text-right font-bold item-subtotal">${item.price * item.qty} บาท</div>
+                    </div>
+                `).join('');
+
+                const group = document.createElement('div');
+                group.className = 'relative py-4 border-b border-gray-200';
+                group.innerHTML = `
+                    <div class="absolute left-0 top-4 w-28 aspect-video rounded-xl overflow-hidden shadow bg-gradient-to-r ${gradient} flex items-center justify-center text-white font-bold text-sm">
+                        ${platformBanner(name)}
+                    </div>
+                    <h3 class="font-bold text-lg leading-tight pl-32">${name}</h3>
+                    <div class="mt-1">${rowsHtml}</div>
+                `;
+                container.appendChild(group);
+            });
+        }
+
+        function calculateGrandTotal() {
             const rows = document.querySelectorAll('.checkout-row');
             let totalQty = 0;
             rows.forEach(r => totalQty += (parseInt(r.querySelector('.item-qty')?.textContent) || 0));

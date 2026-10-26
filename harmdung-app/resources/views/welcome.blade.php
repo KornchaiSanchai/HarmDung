@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HD Harmdung - แพลตฟอร์มรวมภาพยนตร์และสตรีมมิ่ง</title>
+    <title>HD Harmdung</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -46,46 +46,7 @@
 </head>
 <body class="bg-[#171717] text-white font-sans antialiased min-h-screen pb-16 selection:bg-[#00fff2] selection:text-black">
 
-    <!-- แถบนำทาง (Navbar) matching Figma #5:2 & #17:274 -->
-    <header>
-        <nav class="flex items-center justify-between px-8 py-4 border-b border-gray-800/80 bg-[#121212]/80 backdrop-blur-md sticky top-0 z-50">
-            <div class="flex items-center gap-8">
-                <!-- โลโก้ -->
-                <a href="/home" class="flex items-center shrink-0 group">
-                    <img src="/images/logo.png" alt="HD Harmdung" class="h-10 w-auto object-contain scale-125 origin-left transition-transform group-hover:scale-130">
-                </a>
-                
-                <!-- เมนู -->
-                <div class="flex items-center gap-2">
-                    <a href="/home" class="flex items-center gap-2 bg-[#333333] px-5 py-2 rounded-full text-sm text-white shadow-inner">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                        หน้าแรก
-                    </a>
-                    <a href="/products" class="flex items-center gap-2 px-5 py-2 text-sm text-gray-300 hover:text-white transition rounded-full hover:bg-gray-800/50">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                        สินค้าทั้งหมด
-                    </a>
-                    <a href="/cart" class="flex items-center gap-2 px-5 py-2 rounded-full text-sm text-gray-300 hover:text-white transition hover:bg-gray-800/50">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                        ตะกร้า
-                    </a>
-                </div>
-            </div>
-
-            <!-- Profile & Actions matching Figma #17:274 & #5:2 -->
-            <div class="flex items-center gap-4 text-sm font-semibold">
-                <div class="bg-gray-800/90 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 border border-gray-700/80 shadow">
-                    <span class="w-5 h-5 bg-gradient-to-tr from-yellow-500 to-amber-300 rounded-full flex items-center justify-center text-black font-extrabold text-xs shadow-sm">฿</span>
-                    <span class="font-bold text-gray-100">100.00</span>
-                </div>
-                <a href="/member" class="w-10 h-10 bg-[#00fff2] rounded-full flex items-center justify-center text-black font-bold shadow-md hover:scale-105 transition" title="ข้อมูลสมาชิก">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                </a>
-                <a href="/login" class="bg-white text-black px-5 py-2 rounded-full hover:bg-gray-200 transition font-bold text-xs hidden sm:block">เข้าสู่ระบบ</a>
-                <a href="/register" class="bg-[#00fff2] text-black px-5 py-2 rounded-full hover:bg-cyan-300 transition font-bold text-xs hidden sm:block">สมัครสมาชิก</a>
-            </div>
-        </nav>
-    </header>
+    <x-navbar active="home"></x-navbar>
 
     <!-- ช่องค้นหา (Search Bar) matching Figma #5:2 Group 1 -->
     <div class="mt-8 w-full max-w-2xl mx-auto px-4">
@@ -108,38 +69,55 @@
         <div class="relative w-full group">
             <div class="swiper top5-swiper py-8">
                 <div class="swiper-wrapper">
-                    @php
-                        $topMovies = [
-                            ['title' => 'Inception (จิตพิฆาตโลก)', 'tag' => 'Sci-Fi / Action', 'rating' => '4.9', 'gradient' => 'from-indigo-900 via-slate-900 to-black', 'platforms' => ['D', 'N']],
-                            ['title' => 'Interstellar (ทะยานดาวกู้โลก)', 'tag' => 'Sci-Fi / Drama', 'rating' => '4.9', 'gradient' => 'from-blue-950 via-gray-900 to-black', 'platforms' => ['N', 'P']],
-                            ['title' => 'Oppenheimer (ออปเพนไฮเมอร์)', 'tag' => 'Biography / History', 'rating' => '4.8', 'gradient' => 'from-amber-950 via-zinc-900 to-black', 'platforms' => ['H', 'N']],
-                            ['title' => 'Avatar: The Way of Water', 'tag' => 'Adventure / Fantasy', 'rating' => '4.7', 'gradient' => 'from-cyan-950 via-teal-950 to-black', 'platforms' => ['D']],
-                            ['title' => 'The Dark Knight (อัศวินรัตติกาล)', 'tag' => 'Action / Crime', 'rating' => '4.9', 'gradient' => 'from-slate-900 via-neutral-900 to-black', 'platforms' => ['H', 'N']],
-                        ];
-                    @endphp
-
-                    @foreach ($topMovies as $i => $movie)
+                    @forelse ($topMovies as $i => $movie)
                     <div class="swiper-slide cursor-pointer">
-                        <a href="/movie-details" class="w-full aspect-[21/9] bg-gradient-to-r {{ $movie['gradient'] }} rounded-2xl flex flex-col justify-end p-6 md:p-8 shadow-2xl relative overflow-hidden group border border-white/10 block">
-                            <div class="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition"></div>
-                            
-                            <div class="relative z-10 flex items-end justify-between">
-                                <div>
+                        <a href="{{ route('movie-details', ['id' => $movie->id]) }}" class="w-full aspect-[21/9] bg-gradient-to-r from-slate-900 via-neutral-900 to-black rounded-2xl flex items-end p-6 md:p-8 shadow-2xl relative overflow-hidden group border border-white/10 block">
+                            @if ($movie->poster_url)
+                                {{-- พื้นหลังเบลอจากโปสเตอร์ --}}
+                                <img src="{{ $movie->poster_url }}" alt="" aria-hidden="true" loading="lazy"
+                                     class="absolute inset-0 w-full h-full object-cover scale-110 blur-md opacity-60">
+                            @endif
+                            <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-black/20 group-hover:from-black/80 transition"></div>
+
+                            <div class="relative z-10 flex items-end gap-5 w-full">
+                                @if ($movie->poster_url)
+                                    <img src="{{ $movie->poster_url }}" alt="{{ $movie->title }}" loading="lazy"
+                                         class="hidden sm:block h-40 md:h-48 aspect-[2/3] object-cover rounded-xl shadow-2xl border border-white/10">
+                                @endif
+
+                                <div class="flex-1 min-w-0">
                                     <div class="flex items-center gap-2 mb-2">
                                         <span class="w-7 h-7 bg-[#00fff2] text-black font-black rounded-lg text-sm flex items-center justify-center shadow">
                                             #{{ $i + 1 }}
                                         </span>
-                                        <span class="text-xs font-semibold text-gray-300">{{ $movie['tag'] }}</span>
+                                        <span class="text-xs font-semibold text-gray-300 truncate">
+                                            {{ $movie->genres->pluck('name')->take(2)->implode(' / ') }}
+                                            @if ($movie->release_year) · {{ $movie->release_year }} @endif
+                                        </span>
                                     </div>
-                                    <h3 class="text-xl md:text-2xl font-black text-white drop-shadow-md">{{ $movie['title'] }}</h3>
+                                    <h3 class="text-xl md:text-2xl font-black text-white drop-shadow-md line-clamp-1">{{ $movie->title }}</h3>
+                                    @if ($movie->platforms->isNotEmpty())
+                                        <div class="flex items-center gap-1.5 mt-3">
+                                            @foreach ($movie->platforms as $platform)
+                                                @include('partials.platform-badge', ['platform' => $platform, 'size' => 'w-6 h-6'])
+                                            @endforeach
+                                        </div>
+                                    @endif
                                 </div>
-                                <div class="bg-black/60 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-white/10 text-yellow-400 font-bold text-sm flex items-center gap-1">
-                                    ★ {{ $movie['rating'] }}
+
+                                <div class="bg-black/60 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-white/10 text-yellow-400 font-bold text-sm flex items-center gap-1 shrink-0">
+                                    ★ {{ $movie->reviews_count ? number_format($movie->reviews_avg_rating, 1) : '-' }}
                                 </div>
                             </div>
                         </a>
                     </div>
-                    @endforeach
+                    @empty
+                    <div class="swiper-slide">
+                        <div class="w-full aspect-[21/9] rounded-2xl flex items-center justify-center bg-neutral-900 border border-white/10 text-gray-400">
+                            ยังไม่มีข้อมูลหนัง — รัน <code class="mx-1 text-[#00fff2]">php artisan db:seed</code> ก่อน
+                        </div>
+                    </div>
+                    @endforelse
                 </div>
             </div>
 
@@ -153,47 +131,46 @@
     <div class="mt-14 px-8 max-w-[1300px] mx-auto">
         <h2 class="text-2xl font-black mb-8 text-white flex items-center gap-3">
             <span>หมวดหมู่ / Genre</span>
-            <span class="w-2 h-2 rounded-full bg-[#00fff2]"></span>
         </h2>
 
-        @php
-            $genres = [
-                ['name' => 'ดราม่า / Drama', 'movies' => ['The Shawshank Redemption', 'Forrest Gump', 'Parasite', 'Fight Club', 'Whiplash']],
-                ['name' => 'โรแมนติก / Romantic', 'movies' => ['La La Land', 'About Time', 'Titanic', 'Pride & Prejudice', 'Before Sunrise']],
-                ['name' => 'สยองขวัญ / Horror', 'movies' => ['The Conjuring', 'Hereditary', 'A Quiet Place', 'IT', 'Insidious']],
-                ['name' => 'แอคชัน / Action', 'movies' => ['John Wick: Chapter 4', 'Top Gun: Maverick', 'Mad Max: Fury Road', 'The Matrix', 'Gladiator']]
-            ];
-        @endphp
-
-        @foreach ($genres as $genre)
+        @forelse ($genres as $genre)
         <div class="mb-12">
             <h3 class="text-lg font-bold text-gray-200 mb-4 flex items-center justify-between">
-                <span>{{ $genre['name'] }}</span>
-                <a href="/products" class="text-xs text-[#00fff2] hover:underline font-semibold">ดูทั้งหมด →</a>
+                <span>{{ $genre->label }}</span>
+                <span class="text-xs font-semibold text-gray-500">{{ $genre->movies_count }} เรื่อง</span>
             </h3>
 
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-5">
-                @foreach ($genre['movies'] as $mTitle)
-                <a href="/movie-details" class="flex flex-col cursor-pointer group hover:scale-[1.03] transition duration-300">
-                    <div class="w-full aspect-[16/10] bg-gradient-to-tr from-gray-900 to-gray-800 rounded-2xl mb-2.5 shadow-lg overflow-hidden relative border border-gray-800 group-hover:border-[#00fff2]/50 transition flex items-center justify-center p-4">
-                        <div class="text-center">
-                            <div class="w-8 h-8 mx-auto rounded-full bg-white/10 flex items-center justify-center text-white mb-2 group-hover:bg-[#00fff2] group-hover:text-black transition">
-                                ▶
-                            </div>
-                            <span class="text-xs font-bold text-gray-200 line-clamp-1">{{ $mTitle }}</span>
+                @foreach ($genre->movies as $movie)
+                <a href="{{ route('movie-details', ['id' => $movie->id]) }}" class="flex flex-col cursor-pointer group hover:scale-[1.03] transition duration-300">
+                    <div class="w-full aspect-[2/3] bg-gradient-to-tr from-gray-900 to-gray-800 rounded-2xl mb-2.5 shadow-lg overflow-hidden relative border border-gray-800 group-hover:border-[#00fff2]/50 transition flex items-center justify-center">
+                        @if ($movie->poster_url)
+                            <img src="{{ $movie->poster_url }}" alt="{{ $movie->title }}" loading="lazy" class="absolute inset-0 w-full h-full object-cover">
+                        @else
+                            <span class="text-xs font-bold text-gray-200 line-clamp-2 text-center p-4">{{ $movie->title }}</span>
+                        @endif
+                        @if ($movie->reviews_count)
+                            <span class="absolute top-2 right-2 bg-black/70 backdrop-blur px-2 py-0.5 rounded-lg text-[11px] font-bold text-yellow-400">
+                                ★ {{ number_format($movie->reviews_avg_rating, 1) }}
+                            </span>
+                        @endif
+                    </div>
+                    <span class="text-sm font-bold text-gray-200 line-clamp-1 mb-1" title="{{ $movie->title }}">{{ $movie->title }}</span>
+                    @if ($movie->platforms->isNotEmpty())
+                        <div class="flex items-center gap-1.5 text-xs font-semibold text-gray-400 flex-wrap">
+                            <span class="text-[11px]">รับชมได้ที่</span>
+                            @foreach ($movie->platforms as $platform)
+                                @include('partials.platform-badge', ['platform' => $platform, 'size' => 'w-4 h-4'])
+                            @endforeach
                         </div>
-                    </div>
-                    <div class="flex items-center gap-2 text-xs font-semibold text-gray-400">
-                        <span class="text-[11px]">รับชมได้ที่</span>
-                        <div class="w-4 h-4 bg-[#1434A4] rounded text-[9px] flex items-center justify-center text-white font-bold" title="Disney+">D</div>
-                        <div class="w-4 h-4 bg-[#E50914] rounded text-[9px] flex items-center justify-center text-white font-bold" title="Netflix">N</div>
-                        <div class="w-4 h-4 bg-[#5a1bb9] rounded text-[9px] flex items-center justify-center text-white font-bold" title="HIV min">H</div>
-                    </div>
+                    @endif
                 </a>
                 @endforeach
             </div>
         </div>
-        @endforeach
+        @empty
+        <p class="text-gray-400">ยังไม่มีข้อมูลหมวดหมู่</p>
+        @endforelse
     </div>
 
     <!-- นำเข้า Swiper JS -->

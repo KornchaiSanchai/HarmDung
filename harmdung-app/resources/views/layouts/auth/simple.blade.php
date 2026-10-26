@@ -48,12 +48,6 @@
                 {{ $slot }}
             </div>
         </main>
-
-        <!-- Footer -->
-        <footer class="text-center py-6 text-gray-500 text-xs border-t border-gray-800/50">
-            &copy; {{ date('Y') }} HD Harmdung. All rights reserved.
-        </footer>
-
         @persist('toast')
             <flux:toast.group>
                 <flux:toast />

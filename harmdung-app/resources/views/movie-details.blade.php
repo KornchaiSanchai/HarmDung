@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>รายละเอียดภาพยนตร์ - HD Harmdung</title>
+    <title>{{ $movie->title }} - HD Harmdung</title>
+    <meta name="description" content="{{ \Illuminate\Support\Str::limit($movie->synopsis, 155) }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -30,31 +31,38 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
                         สินค้าทั้งหมด
                     </a>
+                    @auth
                     <a href="/cart" class="flex items-center gap-2 px-5 py-2 rounded-full text-sm text-gray-300 hover:text-white transition hover:bg-gray-800/50">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                         ตะกร้า
                     </a>
+                    @endauth
                 </div>
             </div>
 
             <!-- Search Bar in Navbar matching Figma Group 1 -->
             <div class="hidden lg:block relative w-80">
-                <input type="text" placeholder="ค้นหาหนัง หรือ แฟลตฟอร์ม" 
-                       class="w-full bg-white text-black pl-5 pr-10 py-2 rounded-full text-xs outline-none focus:ring-2 focus:ring-[#00fff2] placeholder-gray-400">
                 <button class="absolute right-3.5 top-1/2 -translate-y-1/2 text-black">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </button>
             </div>
 
             <!-- Profile / Balance -->
-            <div class="flex items-center gap-4">
-                <div class="bg-gray-800/90 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 border border-gray-700/80 shadow">
-                    <span class="w-5 h-5 bg-gradient-to-tr from-yellow-500 to-amber-300 rounded-full flex items-center justify-center text-black font-extrabold text-xs shadow-sm">฿</span>
-                    <span class="font-bold text-gray-100">100.00</span>
-                </div>
-                <a href="/member" class="w-10 h-10 bg-[#00fff2] rounded-full flex items-center justify-center text-black font-bold shadow-md hover:scale-105 transition" title="ข้อมูลสมาชิก">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                </a>
+            <div class="flex items-center gap-4 text-sm font-semibold">
+                @auth
+                    <div class="bg-gray-800/90 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 border border-gray-700/80 shadow">
+                        <span class="w-5 h-5 bg-gradient-to-tr from-yellow-500 to-amber-300 rounded-full flex items-center justify-center text-black font-extrabold text-xs shadow-sm">฿</span>
+                        <span class="font-bold text-gray-100">{{ number_format(auth()->user()->balance, 2) }}</span>
+                    </div>
+                    <a href="/profile" class="w-10 h-10 bg-[#00fff2] rounded-full flex items-center justify-center text-black font-bold shadow-md hover:scale-105 transition" title="ข้อมูลสมาชิก">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    </a>
+                @endauth
+
+                @guest
+                    <a href="/login" class="bg-white text-black px-5 py-2 rounded-full hover:bg-gray-200 transition font-bold text-xs">เข้าสู่ระบบ</a>
+                    <a href="/register" class="bg-[#00fff2] text-black px-5 py-2 rounded-full hover:bg-cyan-300 transition font-bold text-xs">สมัครสมาชิก</a>
+                @endguest
             </div>
         </nav>
     </header>
@@ -73,38 +81,46 @@
             
             <!-- Movie Hero Poster matching Figma Rectangle 17 (#13:179) -->
             <div class="relative w-full aspect-[21/9] bg-gradient-to-tr from-gray-950 via-gray-900 to-slate-800 overflow-hidden flex items-end p-8 md:p-12">
+                @if ($movie->poster_url)
+                    <img src="{{ $movie->poster_url }}" alt="" aria-hidden="true" class="absolute inset-0 w-full h-full object-cover scale-110 blur-sm opacity-50">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+                @endif
                 <div class="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-overlay" style="background-image: radial-gradient(circle, rgba(0,255,242,0.3) 0%, rgba(0,0,0,0.8) 100%);"></div>
                 
                 <div class="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6 w-full">
                     <div>
                         <!-- Platform Badges -->
+                        @if ($movie->platforms->isNotEmpty())
                         <div class="flex items-center gap-3 mb-3">
                             <span class="text-xs font-semibold text-gray-300">รับชมได้ที่</span>
-                            <div class="flex items-center gap-2">
-                                <a href="/product-info?platform=thisney" class="px-3 py-1 bg-gradient-to-r from-[#0b1b3d] to-[#043360] rounded-lg text-xs font-bold text-white border border-white/20 hover:scale-105 transition">
-                                    Thisney-
+                            <div class="flex items-center gap-2 flex-wrap">
+                                @foreach ($movie->platforms as $platform)
+                                <a href="/product-info?platform={{ $platform->id }}" class="px-3 py-1 bg-gradient-to-r from-[#0b1b3d] to-[#043360] rounded-lg text-xs font-bold text-white border border-white/20 hover:scale-105 transition flex items-center gap-1.5">
+                                    @include('partials.platform-badge', ['platform' => $platform, 'size' => 'w-4 h-4'])
+                                    {{ $platform->name }}
                                 </a>
-                                <a href="/product-info?platform=netflux" class="px-3 py-1 bg-gradient-to-r from-[#3e0808] to-[#1a0202] rounded-lg text-xs font-bold text-red-500 border border-red-500/30 hover:scale-105 transition">
-                                    NETFLUX
-                                </a>
-                                <a href="/product-info?platform=hiv" class="px-3 py-1 bg-gradient-to-r from-[#5a1bb9] to-[#204ce4] rounded-lg text-xs font-bold text-white border border-white/20 hover:scale-105 transition">
-                                    HIV min
-                                </a>
+                                @endforeach
                             </div>
                         </div>
+                        @endif
 
                         <!-- Movie Title -->
                         <h1 class="text-3xl md:text-5xl font-black text-white tracking-tight drop-shadow-lg">
-                            Inception (จิตพิฆาตโลก)
+                            {{ $movie->title }}
                         </h1>
+                        <div class="mt-2 text-xs font-semibold text-gray-300 flex flex-wrap items-center gap-x-2">
+                            @if ($movie->release_year)<span>{{ $movie->release_year }}</span>@endif
+                            @if ($movie->duration_min)<span>· {{ intdiv($movie->duration_min, 60) }} ชม. {{ $movie->duration_min % 60 }} นาที</span>@endif
+                            @if ($movie->genres->isNotEmpty())<span>· {{ $movie->genres->pluck('name')->implode(' / ') }}</span>@endif
+                        </div>
                     </div>
 
                     <!-- Rating badge matching Figma Group 6 (#13:179) -->
                     <div class="bg-black/60 backdrop-blur-md px-5 py-3 rounded-2xl border border-white/10 flex items-center gap-3">
                         <span class="text-yellow-400 text-2xl font-black">★</span>
                         <div>
-                            <div class="text-2xl font-black text-white leading-none">4.9</div>
-                            <div class="text-[10px] text-gray-400 font-semibold uppercase mt-0.5">Rating (1.2k)</div>
+                            <div class="text-2xl font-black text-white leading-none">{{ $movie->reviews_count ? number_format($movie->reviews_avg_rating, 1) : '-' }}</div>
+                            <div class="text-[10px] text-gray-400 font-semibold uppercase mt-0.5">Rating ({{ $movie->reviews_count }})</div>
                         </div>
                     </div>
                 </div>
@@ -117,12 +133,7 @@
                 <div class="space-y-4">
                     <h2 class="text-xl font-bold text-white">เรื่องย่อภาพยนตร์</h2>
                     <div class="space-y-3 text-sm text-gray-300 leading-relaxed">
-                        <p>
-                            ดอม คอบบ์ (รับบทโดย ลีโอนาร์โด ดิแคพรีโอ) คือหัวขโมยฝีมือฉกาจที่สุดในการฉกข้อมูลลับล้ำค่าจากจิตใต้สำนึกอันลึกซึ้งของเป้าหมายในห้วงความฝัน ความสามารถของคอบบ์ทำให้เขาเป็นที่ต้องการตัวในโลกจารกรรม แต่มันก็ทำให้เขาสูญเสียทุกสิ่งที่เขารักไป
-                        </p>
-                        <p>
-                            โอกาสสุดท้ายในการไถ่บาปและกลับบ้านเกิดขึ้นเมื่อเขาได้รับภารกิจใหม่ที่แทบเป็นไปไม่ได้ แทนที่จะเป็นการขโมยความคิด เขาและทีมงานผู้เชี่ยวชาญต้องทำการ "ปลูกฝังความคิด" (Inception) ลงไปในจิตใจของทายาทมหาเศรษฐี หากทำสำเร็จ มันจะเป็นอาชญากรรมที่สมบูรณ์แบบที่สุด
-                        </p>
+                        <p class="whitespace-pre-line">{{ $movie->synopsis ?: 'ยังไม่มีเรื่องย่อ' }}</p>
                     </div>
 
                     <div class="pt-4 flex items-center gap-4">
@@ -134,88 +145,71 @@
                 </div>
 
                 <!-- Review Section matching Figma #13:179 Review list -->
-                <div class="border-t border-gray-800 pt-8">
+                <div id="reviews" class="border-t border-gray-800 pt-8">
                     <div class="flex items-center justify-between mb-6">
                         <h3 class="text-xl font-bold text-white flex items-center gap-2">
                             <span>รีวิวจากผู้ชม</span>
-                            <span class="text-xs font-normal text-gray-400">Review</span>
+                            <span class="text-xs font-normal text-gray-400">Review ({{ $movie->reviews_count }})</span>
                         </h3>
                     </div>
 
+                    @if (session('status'))
+                        <div class="mb-4 rounded-xl border border-emerald-700/60 bg-emerald-950/50 px-4 py-2 text-sm text-emerald-300">{{ session('status') }}</div>
+                    @endif
+                    @if ($errors->any())
+                        <div class="mb-4 rounded-xl border border-red-700/60 bg-red-950/50 px-4 py-2 text-sm text-red-300">{{ $errors->first() }}</div>
+                    @endif
+
+                    @auth
+                    <form method="POST" action="{{ route('reviews.store', $movie) }}" class="bg-gray-900/80 rounded-2xl p-5 border border-gray-800 mb-6 space-y-3">
+                        @csrf
+                        <div class="flex flex-row-reverse justify-end gap-1 text-3xl">
+                            @for ($s = 5; $s >= 1; $s--)
+                                <input type="radio" name="rating" id="star{{ $s }}" value="{{ $s }}" class="peer sr-only" required>
+                                <label for="star{{ $s }}" class="cursor-pointer text-gray-600 peer-checked:text-yellow-400">★</label>
+                            @endfor
+                        </div>
+                        <textarea name="comment" rows="3" required placeholder="เขียนรีวิวของคุณ..."
+                                class="w-full bg-[#171717] border border-gray-700 rounded-xl p-3 text-sm text-white outline-none focus:ring-2 focus:ring-[#00fff2]"></textarea>
+                        <button type="submit" class="bg-[#00fff2] hover:bg-cyan-300 text-black font-extrabold px-6 py-2 rounded-full text-sm transition">ส่งรีวิว</button>
+                    </form>
+                    @endauth
+
+                    @guest
+                    <div class="bg-gray-900/80 rounded-2xl p-5 border border-gray-800 mb-6 flex items-center justify-between gap-4">
+                        <p class="text-sm text-gray-400">เข้าสู่ระบบเพื่อเขียนรีวิวและให้ดาว</p>
+                        <a href="/login" class="bg-[#00fff2] hover:bg-cyan-300 text-black font-bold px-5 py-2 rounded-full text-xs transition shrink-0">เข้าสู่ระบบ</a>
+                    </div>
+                    @endguest
+
                     <div class="space-y-4">
-                        <!-- Review 1: userxxx -->
+                        @php($avatarColors = ['bg-cyan-900/60 text-[#00fff2]', 'bg-purple-900/60 text-purple-300', 'bg-emerald-900/60 text-emerald-300'])
+                        @forelse ($movie->reviews as $review)
                         <div class="bg-gray-900/80 rounded-2xl p-5 border border-gray-800">
                             <div class="flex items-center justify-between mb-2">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-full bg-cyan-900/60 text-[#00fff2] font-bold text-xs flex items-center justify-center">
-                                        X
+                                    <div class="w-8 h-8 rounded-full {{ $avatarColors[$loop->index % 3] }} font-bold text-xs flex items-center justify-center">
+                                        {{ mb_strtoupper(mb_substr($review->user?->name ?? '?', 0, 1)) }}
                                     </div>
                                     <div>
-                                        <div class="font-bold text-sm text-white">userxxx</div>
-                                        <div class="text-[10px] text-gray-500">2024-10-21 17:37</div>
+                                        <div class="font-bold text-sm text-white">{{ $review->user?->name ?? 'ผู้ใช้ที่ถูกลบ' }}</div>
+                                        <div class="text-[10px] text-gray-500">{{ $review->created_at?->format('Y-m-d H:i') }}</div>
                                     </div>
                                 </div>
                                 <div class="text-yellow-400 text-xs font-bold flex items-center gap-1">
-                                    ★★★★★ <span>4.9</span>
+                                    {{ str_repeat('★', $review->rating) }}<span class="text-gray-600">{{ str_repeat('★', 5 - $review->rating) }}</span> <span>{{ $review->rating }}.0</span>
                                 </div>
                             </div>
-                            <p class="text-xs text-gray-300 leading-relaxed pl-11">
-                                ภาพยนตร์สุดยอดคลาสสิกที่ต้องดูสักครั้งในชีวิต ดนตรีประกอบของ Hans Zimmer ทรงพลังมาก พล็อตเรื่องซับซ้อนแต่ชวนติดตามตลอด 2 ชั่วโมงครึ่ง
-                            </p>
+                            <p class="text-xs text-gray-300 leading-relaxed pl-11 whitespace-pre-line">{{ \Illuminate\Support\Str::limit($review->comment, 800) }}</p>
                         </div>
-
-                        <!-- Review 2: userxyz -->
-                        <div class="bg-gray-900/80 rounded-2xl p-5 border border-gray-800">
-                            <div class="flex items-center justify-between mb-2">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-full bg-purple-900/60 text-purple-300 font-bold text-xs flex items-center justify-center">
-                                        Y
-                                    </div>
-                                    <div>
-                                        <div class="font-bold text-sm text-white">userxyz</div>
-                                        <div class="text-[10px] text-gray-500">2025-01-11 12:34</div>
-                                    </div>
-                                </div>
-                                <div class="text-yellow-400 text-xs font-bold flex items-center gap-1">
-                                    ★★★★★ <span>4.8</span>
-                                </div>
-                            </div>
-                            <p class="text-xs text-gray-300 leading-relaxed pl-11">
-                                แนะนำให้ซื้อแพ็กเกจดูแบบ 4K ครับ ภาพสวยอลังการมาก ซื้อผ่าน HarmDung ใช้งานได้ทันทีไม่สะดุดเลย คุ้มค่ามากครับ
-                            </p>
-                        </div>
-
-                        <!-- Review 3: userabc -->
-                        <div class="bg-gray-900/80 rounded-2xl p-5 border border-gray-800">
-                            <div class="flex items-center justify-between mb-2">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-full bg-emerald-900/60 text-emerald-300 font-bold text-xs flex items-center justify-center">
-                                        A
-                                    </div>
-                                    <div>
-                                        <div class="font-bold text-sm text-white">userabc</div>
-                                        <div class="text-[10px] text-gray-500">2026-04-30 10:47</div>
-                                    </div>
-                                </div>
-                                <div class="text-yellow-400 text-xs font-bold flex items-center gap-1">
-                                    ★★★★★ <span>4.9</span>
-                                </div>
-                            </div>
-                            <p class="text-xs text-gray-300 leading-relaxed pl-11">
-                                หนึ่งในผลงานชิ้นเอกของ Christopher Nolan การแสดงของนักแสดงทุกคนยอดเยี่ยมไร้ที่ติ ดูซ้ำกี่รอบก็ยังประทับใจ
-                            </p>
-                        </div>
+                        @empty
+                        <p class="text-sm text-gray-500">ยังไม่มีรีวิวสำหรับหนังเรื่องนี้</p>
+                        @endforelse
                     </div>
                 </div>
 
             </div>
         </div>
     </main>
-
-    <!-- Footer -->
-    <footer class="text-center py-8 text-gray-500 text-xs border-t border-gray-800/50 mt-12">
-        &copy; {{ date('Y') }} HD Harmdung. All rights reserved.
-    </footer>
-
 </body>
 </html>
