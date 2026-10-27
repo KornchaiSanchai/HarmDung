@@ -204,7 +204,7 @@
                     <thead>
                         <tr class="border-b border-gray-200 text-gray-500 text-xs font-bold uppercase tracking-wider">
                             <th class="py-4 px-4">สินค้าที่ซื้อล่าสุด / Recently Purchased</th>
-                            <th class="py-4 px-4 text-center">ข้อมูลไอดีหนัง / Account</th>
+                            <th class="py-4 px-4 text-center">ข้อมูลบัญชี / Account</th>
                             <th class="py-4 px-4 text-center">วันที่สั่งซื้อ / Purchased At</th>
                             <th class="py-4 px-4 text-center">จำนวน</th>
                             <th class="py-4 px-4 text-right">ยอดรวม</th>
@@ -232,15 +232,12 @@
                                 class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-cyan-50 hover:bg-[#00fff2]/25 text-[#0891b2] hover:text-black font-extrabold text-xs transition border border-[#00fff2]/40 shadow-sm active:scale-95 group">
                             <span>รายละเอียด ({{ $accounts->count() }})</span>
                         </button>
-                        <span class="text-[11px] text-gray-500 font-mono truncate max-w-[150px]">
-                            {{ $accounts->first()->email }}
-                        </span>
                     </div>
                 @else
                     <span class="text-xs text-gray-400 italic">ไม่มีข้อมูลไอดี</span>
                 @endif
             </td>
-            <td class="py-5 px-4 text-center text-gray-600 font-medium">{{ $order->created_at->format('Y-m-d H:i') }}</td>
+            <td class="py-5 px-4 text-center text-gray-600 font-medium">{{ $order->created_at?->timezone('Asia/Bangkok')->format('Y-m-d H:i') }}</td>
             <td class="py-5 px-4 text-center font-bold">{{ $product->pivot->quantity }}</td>
             <td class="py-5 px-4 text-right font-black text-gray-900">{{ number_format($product->pivot->unit_price * $product->pivot->quantity) }} บาท</td>
             <td class="py-5 px-4 text-center">
@@ -279,7 +276,7 @@
             <span class="px-3 py-1.5 bg-cyan-100 text-cyan-800 font-black rounded-lg text-xs tracking-wider">{{ $order->coupon->code }}</span>
             <div class="text-xs text-gray-400 mt-1">ใช้ในคำสั่งซื้อ #HD-{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</div>
         </td>
-        <td class="py-5 px-4 text-center text-gray-600 font-medium">{{ $order->created_at->format('Y-m-d H:i') }}</td>
+        <td class="py-5 px-4 text-center text-gray-600 font-medium">{{ $order->created_at?->timezone('Asia/Bangkok')->format('Y-m-d H:i') }}</td>
         <td class="py-5 px-4 text-center font-extrabold text-emerald-600">-{{ number_format($order->discount_amount, 2) }} บาท</td>
         <td class="py-5 px-4 text-center">
             <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full">ใช้งานแล้ว</span>

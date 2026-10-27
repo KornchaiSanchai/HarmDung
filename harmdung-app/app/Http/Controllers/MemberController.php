@@ -18,7 +18,7 @@ class MemberController extends Controller
 
         // คำนวณสรุปข้อมูลและผูกบัญชีไอดีหนังทั้งหมดจาก Controller
         $orders->each(function ($order) {
-            $order->formatted_date = $order->created_at->format('d/m/Y H:i');
+            $order->formatted_date = $order->created_at?->timezone('Asia/Bangkok')->format('d/m/Y H:i');
             $order->status_label = $order->status === 'paid' ? 'ชำระแล้ว' : $order->status;
             $order->formatted_total = number_format($order->total, 2);
             $order->formatted_discount = number_format($order->discount_amount, 2);

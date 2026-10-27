@@ -43,4 +43,9 @@ class Order extends Model
     {
         return $this->hasMany(AccountStock::class);
     }
+
+    public function getFormattedDateAttribute(): string
+    {
+        return $this->created_at?->timezone('Asia/Bangkok')->format('d/m/Y H:i') ?? '';
+    }
 }
