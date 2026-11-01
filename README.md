@@ -116,7 +116,7 @@ Start the application containers (PHP web app & MySQL database) in background mo
 ### Step 8: Access the Application
 
 Open your browser and navigate to:
-👉 **[http://localhost](http://localhost)**
+👉 **[http://localhost](http://localhost:8000)**
 
 ---
 
