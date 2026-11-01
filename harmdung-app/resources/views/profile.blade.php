@@ -222,7 +222,6 @@
         <tr class="order-row hover:bg-gray-50/80 transition" data-search="{{ strtolower($product->platform->name . ' ' . $product->plan_name . ' ' . $order->id) }}">
             <td class="py-5 px-4">
                 <div class="font-extrabold text-gray-900">{{ $product->platform->name }} (# {{ $product->plan_name }})</div>
-                <div class="text-xs text-gray-400">Order #HD-{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</div>
             </td>
             <td class="py-5 px-4 text-center">
                 @if ($accounts->isNotEmpty())
@@ -274,7 +273,6 @@
     <tr class="hover:bg-gray-50/80 transition">
         <td class="py-5 px-4">
             <span class="px-3 py-1.5 bg-cyan-100 text-cyan-800 font-black rounded-lg text-xs tracking-wider">{{ $order->coupon->code }}</span>
-            <div class="text-xs text-gray-400 mt-1">ใช้ในคำสั่งซื้อ #HD-{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</div>
         </td>
         <td class="py-5 px-4 text-center text-gray-600 font-medium">{{ $order->created_at?->timezone('Asia/Bangkok')->format('Y-m-d H:i') }}</td>
         <td class="py-5 px-4 text-center font-extrabold text-emerald-600">-{{ number_format($order->discount_amount, 2) }} บาท</td>
@@ -374,7 +372,7 @@
         function openAccountModal(platform, plan, orderId, accounts) {
             currentAccountsData = accounts || [];
             document.getElementById('modalPlatformTitle').textContent = platform + ' (' + plan + ')';
-            document.getElementById('modalOrderSubtitle').textContent = 'คำสั่งซื้อ ' + orderId + ' · ทั้งหมด ' + currentAccountsData.length + ' บัญชี';
+            document.getElementById('modalOrderSubtitle').textContent = 'ทั้งหมด ' + currentAccountsData.length + ' บัญชี';
 
             const container = document.getElementById('modalAccountsList');
             container.innerHTML = '';
@@ -395,7 +393,6 @@
                                 <span class="w-2 h-2 rounded-full bg-[#00fff2] animate-pulse"></span>
                                 บัญชีที่ ${index + 1}
                             </span>
-                            <span class="text-[11px] font-mono text-gray-400 bg-black/50 border border-gray-800 px-2 py-0.5 rounded">ID: #${acc.id}</span>
                         </div>
                         
                         <!-- Email / Username -->
