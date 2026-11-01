@@ -3,184 +3,251 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>ตะกร้าสินค้า - HD Harmdung</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-[#171717] text-white font-sans antialiased min-h-screen pb-16 flex flex-col justify-between selection:bg-[#00fff2] selection:text-black">
 
-    <div>
-        <!-- Navbar matching Figma #23:57 & #25:44 -->
-        <header>
-            <nav class="flex items-center justify-between px-8 py-4 border-b border-gray-800/80 bg-[#121212]/80 backdrop-blur-md sticky top-0 z-50">
-                <div class="flex items-center gap-8">
-                    <!-- Logo -->
-                    <a href="/home" class="flex items-center shrink-0 group">
-                        <img src="/images/logo.png" alt="HD Harmdung" class="h-10 w-auto object-contain scale-125 origin-left transition-transform group-hover:scale-130">
-                    </a>
-                    
-                    <!-- Nav items -->
-                    <div class="flex items-center gap-2">
-                        <a href="/home" class="flex items-center gap-2 px-5 py-2 text-sm text-gray-300 hover:text-white transition rounded-full hover:bg-gray-800/50">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                            หน้าแรก
-                        </a>
-                        <a href="/products" class="flex items-center gap-2 px-5 py-2 text-sm text-gray-300 hover:text-white transition rounded-full hover:bg-gray-800/50">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                            สินค้าทั้งหมด
-                        </a>
-                        <a href="/cart" class="flex items-center gap-2 bg-[#333333] px-5 py-2 rounded-full text-sm text-white shadow-inner">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                            ตะกร้า
-                        </a>
-                    </div>
-                </div>
+<body class="bg-[#171717] text-white font-sans antialiased min-h-screen flex flex-col justify-between">
 
-                <!-- Profile & Balance -->
-                <div class="flex items-center gap-4">
-                    <div class="bg-gray-800/90 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 border border-gray-700/80 shadow">
-                        <span class="w-5 h-5 bg-gradient-to-tr from-yellow-500 to-amber-300 rounded-full flex items-center justify-center text-black font-extrabold text-xs shadow-sm">฿</span>
-                        <span class="font-bold text-gray-100">100.00</span>
-                    </div>
-                    <a href="/member" class="w-10 h-10 bg-[#00fff2] rounded-full flex items-center justify-center text-black font-bold shadow-md hover:scale-105 transition" title="ข้อมูลสมาชิก">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                    </a>
-                </div>
-            </nav>
-        </header>
+<div>
+    <x-navbar active="cart"></x-navbar>
 
-        <!-- Main Cart Content matching Figma Group 9 & 10 -->
-        <main class="max-w-[1000px] mx-auto px-6 mt-10">
-            <div class="flex items-center justify-between mb-8">
-                <div>
-                    <h1 class="text-3xl font-extrabold text-white tracking-tight">สินค้าในตะกร้า</h1>
-                    <p class="text-xs text-gray-400 mt-1">ตรวจสอบรายการแพ็กเกจที่คุณเลือกก่อนเข้าสู่ขั้นตอนชำระเงิน</p>
-                </div>
-                <a href="/products" class="text-xs font-bold text-[#00fff2] hover:underline flex items-center gap-1">
-                    + เลือกซื้อสินค้าเพิ่ม
-                </a>
+    <main class="max-w-[1000px] mx-auto px-6 mt-10 w-full">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-3xl font-extrabold">สินค้าในตะกร้า</h1>
+                <p class="text-xs text-gray-400 mt-1">ตรวจสอบสินค้าก่อนชำระเงิน</p>
             </div>
+            <a href="/products" class="text-sm font-bold text-[#00fff2]">+ เลือกซื้อสินค้าเพิ่ม</a>
+        </div>
 
-            <!-- Form ไปหน้า Checkout -->
-            <form action="/checkout" method="GET">
-                <div class="space-y-4">
-                    
-                    <!-- สินค้าชิ้นที่ 1: Thisney- (# 7 วัน) -->
-                    <div class="bg-white text-black rounded-[24px] p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl border border-gray-100 hover:shadow-2xl transition cart-item" data-price="25">
-                        <div class="flex items-center gap-4">
-                            <input type="checkbox" name="items[]" value="thisney_7days" checked onchange="updateCartTotal()" class="item-checkbox w-5 h-5 accent-[#00fff2] rounded cursor-pointer">
-                            <div class="w-28 aspect-video rounded-xl overflow-hidden shadow bg-gradient-to-r from-[#0b1b3d] to-[#043360] flex items-center justify-center text-white font-extrabold text-sm shrink-0">
-                                Thisney-
-                            </div>
-                            <div>
-                                <h3 class="font-extrabold text-lg leading-tight text-gray-900">Thisney-</h3>
-                                <p class="text-gray-500 text-xs mt-1">ตัวเลือกสินค้า <span class="font-bold text-gray-700"># 7 วัน</span></p>
-                                <span class="text-xs text-gray-400">ราคาต่อหน่วย: 25 บาท</span>
-                            </div>
+        @if (session('success'))
+            <div class="mb-5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 px-4 py-3">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="mb-5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 px-4 py-3">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        <!-- ฟอร์มสำหรับส่งไปหน้า Checkout แยกไว้ข้างนอก ไม่ครอบซ้อนกัน -->
+        <form action="{{ route('checkout.index') }}" method="GET" id="checkout-form"></form>
+
+        <div class="space-y-4">
+            @forelse ($cartItems as $item)
+                <div
+                    class="bg-white text-black rounded-[24px] p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl cart-item"
+                    data-id="{{ $item->id }}"
+                    data-price="{{ $item->price }}"
+                    data-quantity="{{ $item->pivot->quantity }}"
+                    data-stock="{{ $item->available_stock }}"
+                >
+                    <div class="flex items-center gap-4">
+                        <!-- ใช้ attribute form="checkout-form" เพื่อเชื่อมกับฟอร์มด้านนอก -->
+                        <input
+                            type="checkbox"
+                            name="items[]"
+                            value="{{ $item->id }}"
+                            form="checkout-form"
+                            checked
+                            class="item-checkbox w-5 h-5 accent-[#00fff2] cursor-pointer"
+                        >
+
+                        <!-- รูปภาพแบนเนอร์สินค้าจากหน้าสินค้าทั้งหมด -->
+                        <div class="{{ $item->platform?->bg_class ?? 'bg-gradient-to-r from-[#0b1b3d] to-[#043360]' }} w-24 aspect-video rounded-xl overflow-hidden flex items-center justify-center shrink-0 shadow border border-white/10">
+                            <img src="{{ $item->platform?->image_url ?? asset('images/logo.png') }}" 
+                                 alt="{{ $item->platform->name ?? 'Harmdung' }}" 
+                                 class="w-full h-full object-cover">
                         </div>
 
-                        <div class="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto border-t sm:border-0 border-gray-100 pt-3 sm:pt-0">
-                            <div class="text-right">
-                                <span class="item-subtotal text-lg font-black text-gray-900">50 บาท</span>
+                        <div>
+                            <h3 class="font-extrabold text-lg">
+                                {{ $item->plan_name }}
+                            </h3>
+
+                            <p class="text-gray-500 text-xs mt-1">
+                                ราคาต่อหน่วย:
+                                {{ $item->formatted_price }}
+                            </p>
+
+                            <div class="flex items-center gap-2 mt-2">
+                                <span class="text-gray-500 text-xs">จำนวน</span>
+                                <button type="button" class="qty-btn w-7 h-7 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-900 font-bold leading-none cursor-pointer flex items-center justify-center" data-delta="-1">−</button>
+                                <span class="item-qty w-6 text-center font-bold text-sm">{{ $item->pivot->quantity }}</span>
+                                <button type="button" class="qty-btn w-7 h-7 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-900 font-bold leading-none cursor-pointer flex items-center justify-center" data-delta="1">+</button>
+                                <span class="text-gray-500 text-xs">ชิ้น</span>
                             </div>
-                            <div class="flex items-center border border-gray-300 rounded-xl overflow-hidden bg-gray-50 shadow-inner">
-                                <button type="button" onclick="adjustQty(this, -1)" class="px-3.5 py-1.5 text-gray-700 hover:bg-gray-200 font-bold transition">-</button>
-                                <span class="px-3 py-1.5 text-sm font-bold min-w-[36px] text-center item-qty-val">2</span>
-                                <button type="button" onclick="adjustQty(this, 1)" class="px-3.5 py-1.5 text-gray-700 hover:bg-gray-200 font-bold transition">+</button>
-                            </div>
+                            <p class="qty-error text-rose-500 font-bold text-xs mt-1.5 hidden"></p>
                         </div>
                     </div>
 
-                    <!-- สินค้าชิ้นที่ 2: HIV min (# 30 วัน) -->
-                    <div class="bg-white text-black rounded-[24px] p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl border border-gray-100 hover:shadow-2xl transition cart-item" data-price="70">
-                        <div class="flex items-center gap-4">
-                            <input type="checkbox" name="items[]" value="hiv_30days" checked onchange="updateCartTotal()" class="item-checkbox w-5 h-5 accent-[#00fff2] rounded cursor-pointer">
-                            <div class="w-28 aspect-video rounded-xl overflow-hidden shadow bg-gradient-to-r from-[#5a1bb9] to-[#204ce4] flex items-center justify-center text-white font-extrabold text-sm shrink-0">
-                                HIV min
-                            </div>
-                            <div>
-                                <h3 class="font-extrabold text-lg leading-tight text-gray-900">HIV min</h3>
-                                <p class="text-gray-500 text-xs mt-1">ตัวเลือกสินค้า <span class="font-bold text-gray-700"># 30 วัน</span></p>
-                                <span class="text-xs text-gray-400">ราคาต่อหน่วย: 70 บาท</span>
-                            </div>
+                    <div class="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto">
+                        <div class="text-right">
+                            <span class="item-subtotal text-lg font-black">
+                                {{ $item->formatted_subtotal }}
+                            </span>
                         </div>
 
-                        <div class="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto border-t sm:border-0 border-gray-100 pt-3 sm:pt-0">
-                            <div class="text-right">
-                                <span class="item-subtotal text-lg font-black text-gray-900">70 บาท</span>
-                            </div>
-                            <div class="flex items-center border border-gray-300 rounded-xl overflow-hidden bg-gray-50 shadow-inner">
-                                <button type="button" onclick="adjustQty(this, -1)" class="px-3.5 py-1.5 text-gray-700 hover:bg-gray-200 font-bold transition">-</button>
-                                <span class="px-3 py-1.5 text-sm font-bold min-w-[36px] text-center item-qty-val">1</span>
-                                <button type="button" onclick="adjustQty(this, 1)" class="px-3.5 py-1.5 text-gray-700 hover:bg-gray-200 font-bold transition">+</button>
-                            </div>
-                        </div>
+                        <!-- ฟอร์มลบสินค้าแยกอิสระ ไม่ซ้อนกับฟอร์มอื่น -->
+                        <form action="{{ route('cart.destroy', $item->id) }}" method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-red-500 hover:text-red-700 text-sm font-bold cursor-pointer">
+                                ลบ
+                            </button>
+                        </form>
                     </div>
+                </div>
+            @empty
+                <div class="bg-gray-900 rounded-[24px] p-12 text-center border border-gray-800">
+                    <p class="text-gray-400">ยังไม่มีสินค้าในตะกร้าของคุณ</p>
+                    <a href="/products" class="inline-block mt-4 bg-[#00fff2] text-black font-bold px-6 py-2 rounded-full text-xs">
+                        เลือกซื้อสินค้า
+                    </a>
+                </div>
+            @endforelse
+        </div>
 
+        @if ($cartItems->isNotEmpty())
+            <div class="mt-8 bg-gray-900 rounded-[24px] p-6 border border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-6">
+                <div class="text-center sm:text-left">
+                    <div class="text-xs text-gray-400">สินค้าที่เลือกชำระเงิน</div>
+
+                    <div class="text-xl font-black mt-1">
+                        <span id="selected-count" class="text-[#00fff2]">{{ $totalCount }}</span>
+                        ชิ้น :
+                        <span id="selected-total" class="text-2xl text-[#00fff2]">{{ $formattedTotal }}</span>
+                        บาท
+                    </div>
                 </div>
 
-                <!-- สรุปยอดและปุ่มไปชำระเงิน matching Figma #25:44 -->
-                <div class="mt-8 bg-gray-900/90 rounded-[24px] p-6 border border-gray-800 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-6">
-                    <div class="text-center sm:text-left">
-                        <div class="text-xs text-gray-400">คำสั่งซื้อที่เลือก</div>
-                        <div class="text-xl font-black text-white mt-0.5">
-                            ทั้งหมด <span id="cart-selected-count" class="text-[#00fff2]">3</span> ชิ้น : 
-                            <span id="cart-total-price" class="text-2xl font-black text-[#00fff2] ml-1">120 บาท</span>
-                        </div>
-                    </div>
+                <!-- ปุ่มกดส่งฟอร์มผูกกับ id checkout-form ด้านนอก -->
+                <button
+                    type="submit"
+                    form="checkout-form"
+                    id="checkout-button"
+                    class="bg-[#00fff2] hover:bg-cyan-300 text-black font-extrabold px-8 py-3.5 rounded-full disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                >
+                    ไปที่หน้าชำระเงิน
+                </button>
+            </div>
+        @endif
+    </main>
+</div>
 
-                    <div class="flex items-center gap-4 w-full sm:w-auto">
-                        <button type="submit" class="w-full sm:w-auto bg-[#00fff2] hover:bg-cyan-300 text-black font-extrabold px-10 py-3.5 rounded-full transition shadow-lg shadow-cyan-500/25 text-base flex items-center justify-center gap-2 cursor-pointer active:scale-95">
-                            <span>ไปที่หน้าชำระเงิน</span>
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </main>
-    </div>
+<x-footer></x-footer>
 
-    <!-- Footer -->
-    <footer class="text-center py-6 text-gray-500 text-xs border-t border-gray-800/50 mt-12">
-        &copy; {{ date('Y') }} HD Harmdung. All rights reserved.
-    </footer>
+<script>
+    // ส่งรายการที่เลือกไปให้ CartController คำนวณยอดเงินและจำนวนจาก Backend โดยตรง
+    async function updateCartTotal() {
+        const checkedBoxes = Array.from(document.querySelectorAll('.item-checkbox:checked'));
+        const selectedIds = checkedBoxes.map(cb => cb.value);
 
-    <script>
-        function adjustQty(btn, change) {
-            const container = btn.parentElement;
-            const span = container.querySelector('.item-qty-val');
-            let val = parseInt(span.textContent) + change;
-            if (val < 1) val = 1;
-            span.textContent = val;
-            
-            // Recalculate item subtotal
-            const row = btn.closest('.cart-item');
-            const unitPrice = parseFloat(row.getAttribute('data-price'));
-            row.querySelector('.item-subtotal').textContent = (unitPrice * val) + ' บาท';
-            
-            updateCartTotal();
-        }
-
-        function updateCartTotal() {
-            const rows = document.querySelectorAll('.cart-item');
-            let totalCount = 0;
-            let totalPrice = 0;
-
-            rows.forEach(row => {
-                const checkbox = row.querySelector('.item-checkbox');
-                if (checkbox.checked) {
-                    const qty = parseInt(row.querySelector('.item-qty-val').textContent);
-                    const unitPrice = parseFloat(row.getAttribute('data-price'));
-                    totalCount += qty;
-                    totalPrice += (qty * unitPrice);
-                }
+        try {
+            const res = await fetch('{{ route('cart.calculate') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: JSON.stringify({ items: selectedIds }),
             });
 
-            document.getElementById('cart-selected-count').textContent = totalCount;
-            document.getElementById('cart-total-price').textContent = totalPrice + ' บาท';
+            if (!res.ok) return;
+            const data = await res.json();
+
+            document.getElementById('selected-count').textContent = data.count;
+            document.getElementById('selected-total').textContent = data.total_formatted;
+
+            const button = document.getElementById('checkout-button');
+            if (button) {
+                button.disabled = !data.can_checkout;
+            }
+        } catch (e) {
+            console.error('Calculate error', e);
         }
-    </script>
+    }
+
+    document.querySelectorAll('.item-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', updateCartTotal);
+    });
+
+    document.querySelectorAll('.qty-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const item = btn.closest('.cart-item');
+            const errorEl = item.querySelector('.qty-error');
+            const oldQty = Number(item.dataset.quantity);
+            const delta = Number(btn.dataset.delta);
+            const newQty = oldQty + delta;
+
+            errorEl.classList.add('hidden');
+            if (newQty < 1) {
+                // หากกดเครื่องหมายลบ (-) เมื่อมีสินค้าในตะกร้า 1 ชิ้น จะเป็นการลบสินค้าออกจากตะกร้า
+                const deleteForm = item.querySelector('form');
+                if (deleteForm) {
+                    btn.disabled = true;
+                    deleteForm.submit();
+                }
+                return;
+            }
+
+            btn.disabled = true;
+            try {
+                // ส่งคำขอไปให้ CartController@update ตรวจสต็อกและคำนวณราคาใหม่จาก Database
+                const res = await fetch(`/cart/update/${item.dataset.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    },
+                    body: JSON.stringify({ quantity: newQty }),
+                });
+
+                if (!res.ok) {
+                    const data = await res.json().catch(() => ({}));
+                    if (data.available !== undefined) {
+                        item.dataset.stock = data.available;
+                    }
+                    errorEl.textContent = data.errors?.quantity?.[0] ?? data.message ?? 'จำนวนสินค้าใน stock ไม่เพียงพอ';
+                    errorEl.classList.remove('hidden');
+                    return;
+                }
+
+                const data = await res.json();
+                item.dataset.quantity = data.quantity;
+                item.querySelector('.item-qty').textContent = data.quantity;
+                // รับยอดรวมย่อยที่คำนวณจาก Controller โดยตรง
+                item.querySelector('.item-subtotal').textContent = data.item_subtotal_text;
+
+                if (typeof data.cart_count !== 'undefined') {
+                    const navCartBadge = document.getElementById('nav-cart-count');
+                    if (navCartBadge) {
+                        navCartBadge.textContent = data.cart_count > 0 ? `(${data.cart_count})` : '';
+                    }
+                }
+
+                // อัปเดตยอดรวมคำสั่งซื้อผ่าน Controller
+                await updateCartTotal();
+            } catch (err) {
+                errorEl.textContent = 'เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่อีกครั้ง';
+                errorEl.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+            }
+        });
+    });
+
+    updateCartTotal();
+</script>
+
 </body>
 </html>

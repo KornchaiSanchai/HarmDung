@@ -1,8 +1,6 @@
 <?php
 
 namespace Database\Seeders;
-
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -17,18 +15,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::firstOrCreate(
-            ['email' => 'member@example.com'],
-            ['name' => 'Test Member', 'password' => 'password'],
-        );
 
         $order = [
+            UserSeeder::class,       // วุ้น
             PlatformSeeder::class,   // มะปิน
             GenreSeeder::class,      // มะปิน
             MovieSeeder::class,      // มะปิน (รวม movie_platform, movie_genre)
             ProductSeeder::class,    // อิ้ง
+            AccountStockSeeder::class, // อิ้ง
             CouponSeeder::class,     // กร (รวม coupon_product)
             ReviewSeeder::class,     // กร (optional)
         ];
@@ -39,5 +33,9 @@ class DatabaseSeeder extends Seeder
                 $this->call($seeder);
             }
         }
+
+        $this->call([
+            CouponSeeder::class,
+        ]);
     }
 }

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Product extends Model
 {
     protected $fillable = ['platform_id', 'plan_name', 'duration_days', 'price', 'stock'];
+    
 
     protected function casts(): array
     {
@@ -30,4 +31,13 @@ class Product extends Model
         return $this->belongsToMany(Order::class, 'order_items')
             ->withPivot('quantity', 'unit_price');
     }
+    public function accountStocks()
+{
+    return $this->hasMany(AccountStock::class);
+}
+
+public function getAvailableStockAttribute(): int
+{
+    return $this->accountStocks()->where('status', 'available')->count();
+}
 }

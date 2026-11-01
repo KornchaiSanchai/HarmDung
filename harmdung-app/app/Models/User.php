@@ -44,9 +44,10 @@ class User extends Authenticatable implements PasskeyUser
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'balance' => 'decimal:2',
+    ];
     }
 
     /**
@@ -59,6 +60,11 @@ class User extends Authenticatable implements PasskeyUser
         return Str::length($initials) > 1
             ? Str::substr($initials, 0, 1).Str::substr($initials, -1)
             : $initials;
+    }
+
+    public function getFormattedBalanceAttribute(): string
+    {
+        return number_format((float) ($this->balance ?? 0), 2);
     }
 
     public function reviews(): HasMany

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>ชำระเงิน - HD Harmdung</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,160 +13,204 @@
 <body class="bg-[#121212] text-white font-sans antialiased min-h-screen pb-12 flex flex-col justify-between">
 
     <div>
-       <nav class="flex items-center justify-between px-8 py-4 border-b border-gray-800">
-            <div class="flex items-center gap-8">
-                <!-- โลโก้ -->
-                <a href="/" class="flex items-center shrink-0">
-                    <img src="/images/logo.png" alt="HD Harmdung" class="h-10 w-auto object-contain scale-150 origin-left">
-                </a>
-                <!-- เมนู -->
-                <div class="flex items-center gap-2">
-                    <a href="/home" class="flex items-center gap-2 px-5 py-2 text-sm text-gray-300 hover:text-white transition">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                        หน้าแรก
-                    </a>
-                    <a href="/products" class="flex items-center gap-2 px-5 py-2 text-sm text-gray-300 hover:text-white transition">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                        สินค้าทั้งหมด
-                    </a>
-                    <a href="/cart" class="flex items-center gap-2 bg-gray-700/80 px-5 py-2 rounded-full text-sm text-white">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                        ตะกร้า
-                    </a>
-                </div>
-            </div>
-
-            <!-- ยอดเงิน / โปรไฟล์ -->
-            <div class="flex items-center gap-4">
-                <div class="bg-gray-800 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 border border-gray-700">
-                    <span class="w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center text-black font-bold text-xs">฿</span>
-                    100.00
-                </div>
-                <a href="/member" class="w-10 h-10 bg-[#00fff2] rounded-full flex items-center justify-center text-black font-bold shadow-md hover:scale-105 transition" title="ข้อมูลสมาชิก">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                </a>
-            </div>
-        </nav>
+        <x-navbar active="cart"></x-navbar>
 
         <!-- Checkout Main Content -->
-        <main class="max-w-[900px] mx-auto px-6 mt-10">
-            <h1 class="text-2xl font-bold text-center mb-8">ชำระเงิน</h1>
+        <main class="max-w-[900px] mx-auto px-6 mt-10 bg-gray-900/80 p-8 rounded-[24px] border border-gray-800 shadow-2xl">
+            <h1 class="text-3xl font-extrabold text-center mb-8 text-white">ชำระเงิน</h1>
 
-            <div class="bg-white text-black rounded-[24px] p-8 shadow-2xl">
-                
-                <!-- หัวตาราง -->
-                <div class="grid grid-cols-12 text-gray-500 font-semibold text-sm pb-4 border-b border-gray-200">
-                    <div class="col-span-6">สินค้าที่สั่งซื้อแล้ว</div>
-                    <div class="col-span-2 text-center">ราคาต่อหน่วย</div>
-                    <div class="col-span-2 text-center">จำนวน</div>
-                    <div class="col-span-2 text-right">รายการย่อย</div>
+            @if (session('error'))
+                <div class="mb-6 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-sm px-4 py-3">
+                    {{ session('error') }}
                 </div>
+            @endif
 
-                <!-- รายการสินค้า 1 -->
-                <div class="grid grid-cols-12 items-center py-4 border-b border-gray-100 gap-4 checkout-row" data-price="25">
-                    <div class="col-span-6 flex items-center gap-4">
-                        <div class="w-28 aspect-video rounded-xl overflow-hidden shadow bg-gradient-to-r from-[#0b1b3d] to-[#043360] flex items-center justify-center text-white font-bold text-sm">
-                            Thisney-
+            <!-- หัวตาราง -->
+            <div class="grid grid-cols-12 text-gray-400 font-semibold text-sm pb-4 border-b border-gray-800">
+                <div class="col-span-6">สินค้าที่สั่งซื้อ</div>
+                <div class="col-span-2 text-center">ราคาต่อหน่วย</div>
+                <div class="col-span-2 text-center">จำนวน</div>
+                <div class="col-span-2 text-right">รายการย่อย</div>
+            </div>
+
+            <!-- รายการสินค้าจาก Backend -->
+            <div class="divide-y divide-gray-800 mb-6">
+                @forelse($cartItems as $item)
+                    <div class="grid grid-cols-12 items-center py-4 gap-4">
+                        <div class="col-span-6 flex items-center gap-4">
+                            <div class="w-20 aspect-video rounded-xl overflow-hidden shadow border border-white/10 shrink-0 bg-black/40 flex items-center justify-center">
+                                @if(!empty($item->platform?->image_url))
+                                    <img src="{{ $item->platform->image_url }}" alt="{{ $item->platform->name ?? 'Harmdung' }}" class="w-full h-full object-cover">
+                                @else
+                                    <div class="w-full h-full bg-gradient-to-r from-[#0b1b3d] to-[#043360] flex items-center justify-center text-white font-bold text-xs">
+                                        {{ $item->platform->name ?? 'Harmdung' }}
+                                    </div>
+                                @endif
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-base text-white">{{ $item->plan_name }}</h3>
+                                @if(!empty($item->platform?->name))
+                                    <p class="text-xs text-gray-400 mt-0.5">{{ $item->platform->name }}</p>
+                                @endif
+                            </div>
                         </div>
-                        <div>
-                            <h3 class="font-bold text-lg leading-tight">Thisney-</h3>
-                            <p class="text-gray-400 text-xs mt-0.5">ตัวเลือกสินค้า # 7 วัน</p>
+                        <div class="col-span-2 text-center text-gray-300 text-sm">{{ number_format($item->price, 2) }} บาท</div>
+                        <div class="col-span-2 text-center text-gray-300 text-sm font-semibold">{{ $item->pivot->quantity }}</div>
+                        <div class="col-span-2 text-right text-[#00fff2] font-bold text-sm">
+                            {{ number_format($item->price * $item->pivot->quantity, 2) }} บาท
                         </div>
                     </div>
-                    <div class="col-span-2 text-center font-medium">25 บาท</div>
-                    <div class="col-span-2 text-center font-medium item-qty">2</div>
-                    <div class="col-span-2 text-right font-bold item-subtotal">50 บาท</div>
-                </div>
-
-                <!-- รายการสินค้า 2 -->
-                <div class="grid grid-cols-12 items-center py-4 border-b border-gray-200 gap-4 checkout-row" data-price="70">
-                    <div class="col-span-6 flex items-center gap-4">
-                        <div class="w-28 aspect-video rounded-xl overflow-hidden shadow bg-gradient-to-r from-[#5a1bb9] to-[#204ce4] flex items-center justify-center text-white font-bold text-sm">
-                            HIV min
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-lg leading-tight">HIV min</h3>
-                            <p class="text-gray-400 text-xs mt-0.5">ตัวเลือกสินค้า # 30 วัน</p>
-                        </div>
+                @empty
+                    <div class="py-12 text-center text-gray-500">
+                        <p class="text-base font-semibold">ไม่มีรายการสินค้าที่เลือกชำระเงิน</p>
+                        <a href="{{ route('cart.index') }}" class="inline-block mt-3 text-sm font-bold text-[#00fff2] hover:underline">← กลับไปที่ตะกร้าสินค้า</a>
                     </div>
-                    <div class="col-span-2 text-center font-medium">70 บาท</div>
-                    <div class="col-span-2 text-center font-medium item-qty">1</div>
-                    <div class="col-span-2 text-right font-bold item-subtotal">70 บาท</div>
-                </div>
+                @endforelse
+            </div>
 
-                <!-- ส่วนเลือกคูปองส่วนลด -->
-                <div class="py-5 border-b border-gray-200 flex flex-col md:flex-row items-center justify-between gap-4">
-                    <div class="flex items-center gap-3 w-full md:w-auto">
-                        <svg class="w-6 h-6 text-gray-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
-                        <span class="font-bold text-gray-800">ส่วนลดคำสั่งซื้อ (คูปอง)</span>
+            <!-- ส่วนกรอกคูปองส่วนลด -->
+            <!-- ส่วนลดคำสั่งซื้อ (คูปอง) -->
+            <div class="bg-[#202020] p-6 rounded-2xl border border-gray-800 space-y-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2 text-cyan-300 font-bold text-sm">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+                        <span>ส่วนลดคำสั่งซื้อ (คูปอง)</span>
                     </div>
 
-                    <div class="flex items-center gap-2 w-full md:w-auto justify-end">
-                        <input type="text" placeholder="ค้นหาโค้ดส่วนลด..." class="border border-gray-300 rounded-lg px-3 py-1.5 text-sm outline-none focus:border-cyan-500 bg-gray-50">
-                        
-                        <select id="discount-select" onchange="calculateGrandTotal()" class="border border-gray-300 rounded-lg px-4 py-1.5 text-sm font-semibold bg-white outline-none focus:border-cyan-500 cursor-pointer">
-                            <option value="0" data-type="none">-- เลือกส่วนลด --</option>
-                            <option value="10" data-type="percent" selected>ส่วนลด -10%</option>
-                            <option value="20" data-type="percent">ส่วนลด -20%</option>
-                            <option value="50" data-type="fixed">ส่วนลด 50 บาท</option>
+                    @if(!empty($couponCode))
+                        <span class="text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-full font-bold">
+                            กำลังใช้คูปอง: {{ $couponCode }}
+                        </span>
+                    @endif
+                </div>
+
+                <!-- ป้ายแสดงคูปองที่กำลังใช้งานอยู่ พร้อมปุ่มยกเลิก -->
+                @if(!empty($couponCode))
+                    <div class="flex items-center justify-between bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-4 py-3 text-sm">
+                        <div class="flex items-center gap-2 text-emerald-300">
+                            <svg class="w-5 h-5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                            <div>
+                                <span class="font-extrabold text-white">{{ $couponCode }}</span>
+                                <span class="text-xs text-emerald-400 ml-1">
+                                    ({{ $appliedCoupon['name'] ?? 'ส่วนลด' }} — ลด {{ number_format($discountAmount, 2) }} บาท)
+                                </span>
+                            </div>
+                        </div>
+                        <button type="button" id="removeCouponBtn" class="text-xs text-rose-400 hover:text-rose-300 font-bold cursor-pointer ml-3 shrink-0">
+                            ✕ 
+                        </button>
+                    </div>
+                @endif
+
+                @if(!empty($couponError))
+                    <div class="bg-rose-500/10 border border-rose-500/30 text-rose-300 rounded-xl px-4 py-2.5 text-xs flex items-center gap-2">
+                        <svg class="w-4 h-4 shrink-0 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        <span>{{ $couponError }}</span>
+                    </div>
+                @endif
+
+                <form action="{{ route('checkout.index') }}" method="GET" id="couponForm" class="space-y-4">
+                    @foreach($selectedIds as $id)
+                        <input type="hidden" name="items[]" value="{{ $id }}">
+                    @endforeach
+                    <input type="hidden" name="coupon_code" id="hiddenCouponCode" value="{{ $couponCode ?? '' }}">
+
+                    <!-- เลือกจาก Dropdown คูปองที่มี -->
+                    <div>
+                        <label for="couponSelect" class="block text-xs text-gray-400 mb-1.5 font-medium">
+                            เลือกคูปองส่วนลดที่มี (สามารถเปลี่ยนหรือยกเลิกได้):
+                        </label>
+                        <select id="couponSelect" class="w-full bg-[#171717] border border-gray-700 text-white text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-[#00fff2] cursor-pointer transition">
+                            <option value="" class="bg-[#171717] text-gray-400">-- ไม่ใช้คูปองส่วนลด / ยกเลิกคูปอง --</option>
+                            @isset($availableCoupons)
+                                @foreach($availableCoupons as $c)
+                                    @if($c['usable'])
+                                        <option value="{{ $c['code'] }}" {{ ($couponCode ?? '') === $c['code'] ? 'selected' : '' }} class="bg-[#171717] text-white py-1">
+                                            {{ $c['code'] }} ({{ $c['name'] }}) — {{ $c['desc'] }} @if(($c['discount'] ?? 0) > 0)(ประหยัด ฿{{ number_format($c['discount'], 2) }})@endif
+                                        </option>
+                                    @else
+                                        {{-- คูปองที่ใช้ไม่ได้: ตัวหนังสือสีจาง (text-gray-500 opacity-50) และเขียนคำอธิบายเหตุผลต่อท้าย --}}
+                                        <option value="{{ $c['code'] }}" disabled class="bg-[#191919] text-gray-500 opacity-50 py-1">
+                                            {{ $c['code'] }} ({{ $c['name'] }}) — ไม่สามารถใช้ได้: {{ $c['reason'] }}
+                                        </option>
+                                    @endif
+                                @endforeach
+                            @endisset
                         </select>
                     </div>
-                </div>
-
-                <!-- สรุปราคาและปุ่มยืนยัน -->
-                <div class="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div class="text-xl font-bold">
-                        คำสั่งซื้อทั้งหมด <span id="total-qty" class="text-cyan-600">3</span> ชิ้น : <span id="grand-total" class="text-2xl font-extrabold text-black">108 บาท</span>
-                    </div>
-                    <div class="flex items-center gap-3 w-full sm:w-auto">
-                        <a href="/cart" class="w-full sm:w-auto text-center bg-gray-200 text-black font-bold px-6 py-3 rounded-xl hover:bg-gray-300 transition">
-                            ย้อนกลับ
-                        </a>
-                        <a href="/payment-success" class="w-full sm:w-auto text-center bg-[#00fff2] text-black font-bold px-8 py-3 rounded-xl hover:bg-cyan-300 transition shadow-md shadow-cyan-500/20">
-                            สั่งซื้อสินค้า
-                        </a>
-                    </div>
-                </div>
-
+                </form>
             </div>
+
+            <!-- สรุปยอดเงิน -->
+            <div class="pt-6 text-sm text-gray-300 space-y-1.5 text-right border-t border-gray-800 mt-6">
+                <div>ยอดรวมสินค้า: <span class="font-semibold">{{ number_format($subtotal ?? 0, 2) }}</span> บาท</div>
+                @if(($discountAmount ?? 0) > 0)
+                    <div class="text-emerald-400 font-bold">
+                        ส่วนลด ({{ $couponCode }}): -{{ number_format($discountAmount, 2) }} บาท
+                    </div>
+                @else
+                    <div class="text-gray-500">ส่วนลด: -0.00 บาท</div>
+                @endif
+            </div>
+
+            <!-- ฟอร์มยืนยันสั่งซื้อ (POST ไป checkout.process) -->
+            <form method="POST" action="{{ route('checkout.process') }}" class="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-800 mt-4">
+                @csrf
+                <input type="hidden" name="coupon_code" value="{{ $couponCode ?? '' }}">
+                @foreach($selectedIds as $id)
+                    <input type="hidden" name="items[]" value="{{ $id }}">
+                @endforeach
+                
+                <div class="text-xl font-bold">
+                    คำสั่งซื้อทั้งหมด <span class="text-[#00fff2]">{{ isset($cartItems) ? $cartItems->sum(fn ($i) => $i->pivot->quantity) : 0 }}</span> ชิ้น :
+                    <span class="text-2xl font-extrabold text-[#00fff2] ml-1">{{ number_format($total ?? 0, 2) }} บาท</span>
+                </div>
+
+                <div class="flex items-center gap-3 w-full sm:w-auto">
+                    <a href="{{ route('cart.index') }}" class="w-full sm:w-auto bg-gray-200 text-black font-bold px-6 py-3.5 rounded-full transition shadow-md shadow-gray-500/20 text-base flex items-center justify-center gap-2 cursor-pointer active:scale-95">ย้อนกลับ</a>
+                    <button type="submit" class="bg-[#00fff2] hover:bg-cyan-300 text-black font-extrabold px-8 py-3.5 rounded-full disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer">
+                        สั่งซื้อสินค้า
+                    </button>
+                </div>
+                
+            </form>
         </main>
     </div>
 
+    <!-- JavaScript สำหรับการเลือก/เปลี่ยนคูปองและล้างคูปอง -->
     <script>
-        // คำนวณราคาอัตโนมัติเมื่อโหลดหน้า
-        window.onload = function() {
-            calculateGrandTotal();
-        };
+        document.addEventListener('DOMContentLoaded', function () {
+            const couponForm = document.getElementById('couponForm');
+            const hiddenCouponCode = document.getElementById('hiddenCouponCode');
+            const couponSelect = document.getElementById('couponSelect');
+            const removeCouponBtn = document.getElementById('removeCouponBtn');
 
-        function calculateGrandTotal() {
-            const rows = document.querySelectorAll('.checkout-row');
-            let totalQty = 0;
-            let rawTotal = 0;
-
-            rows.forEach(row => {
-                const qty = parseInt(row.querySelector('.item-qty').textContent);
-                const unitPrice = parseFloat(row.getAttribute('data-price'));
-                totalQty += qty;
-                rawTotal += (qty * unitPrice);
-            });
-
-            const discountSelect = document.getElementById('discount-select');
-            const selectedOption = discountSelect.options[discountSelect.selectedIndex];
-            const discountValue = parseFloat(selectedOption.value) || 0;
-            const discountType = selectedOption.getAttribute('data-type');
-
-            let finalTotal = rawTotal;
-            if (discountType === 'percent') {
-                finalTotal = rawTotal * (1 - discountValue / 100);
-            } else if (discountType === 'fixed') {
-                finalTotal = rawTotal - discountValue;
+            // 1) เมื่อเลือกจาก Dropdown -> เปลี่ยนคูปองทันที (หรือถ้าเลือกค่าว่างจะเป็นการยกเลิกคูปอง)
+            if (couponSelect) {
+                couponSelect.addEventListener('change', function () {
+                    if (hiddenCouponCode) {
+                        hiddenCouponCode.value = this.value;
+                    }
+                    if (couponForm) {
+                        couponForm.submit();
+                    }
+                });
             }
 
-            if (finalTotal < 0) finalTotal = 0;
-
-            document.getElementById('total-qty').textContent = totalQty;
-            document.getElementById('grand-total').textContent = Math.round(finalTotal) + ' บาท';
-        }
+            // 2) เมื่อกดยกเลิกคูปอง
+            if (removeCouponBtn) {
+                removeCouponBtn.addEventListener('click', function () {
+                    if (hiddenCouponCode) {
+                        hiddenCouponCode.value = '';
+                    }
+                    if (couponForm) {
+                        couponForm.submit();
+                    }
+                });
+            }
+        });
     </script>
+
+    <x-footer></x-footer>
 </body>
 </html>
